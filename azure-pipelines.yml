@@ -41,7 +41,6 @@ stages:
           - publish: $(Pipeline.Workspace)/variables
             artifact: variables
 
-
   # Tag only on master
   - stage: StageKustomize
     displayName: 'Kustomize'
