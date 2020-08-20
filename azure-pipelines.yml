@@ -61,19 +61,11 @@ stages:
             displayName: 'Read variable and expose in the job.'
 
           - bash: |
-              echo $VERSION
               mkdir -p $(Pipeline.Workspace)/$K8S_DIR
               cd $K8S_DIR
-
               curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-
-              echo "$DOCKER_REGISTRY:$VERSION"
-              echo "$K8S_DIR"
-
               ./kustomize edit set image $K8S_DEFAULT_IMAGE $K8S_DEFAULT_IMAGE=$DOCKER_REGISTRY:$VERSION
-
               ./kustomize build > $(Pipeline.Workspace)/$K8S_DIR/depl_$NAME_$VERSION.yaml
-
 
             displayName: 'Kustomize Build'
           # Publish the folder as pipeline artifact
