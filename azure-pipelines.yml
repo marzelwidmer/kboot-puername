@@ -6,13 +6,15 @@
 trigger:
   - /**
 
-
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  SemVer_ShortSha_BuildID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
-  name: $(Build.DefinitionName)
+  SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
+  NAME: $(Build.DefinitionName)
+  K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
+  K8S_DIR: 'k8s'
+  DOCKER_REGISTRY: 'docker-registry.default.svc:5000/dev/kboot-bname-service'
 
 stages:
   # SemVer
@@ -33,12 +35,11 @@ stages:
               configFilePath: '$(GIT_VERSION_CONFIGURATION)'
           - bash: |
               mkdir -p $(Pipeline.Workspace)/variables
-              echo "$(SemVer_ShortSha_BuildID)" > $(Pipeline.Workspace)/variables/VERSION
+              echo "$(SEMVER_SHORTSHA_BUILDID)" > $(Pipeline.Workspace)/variables/VERSION
             displayName: 'Save Version'
             # Publish the folder as pipeline artifact
           - publish: $(Pipeline.Workspace)/variables
             artifact: variables
-
 
   # Tag only on master
   - stage: StageKustomize
@@ -60,10 +61,12 @@ stages:
             displayName: 'Read variable and expose in the job.'
 
           - bash: |
-              echo $VERSION
+              mkdir -p $(Pipeline.Workspace)/$K8S_DIR
+              cd $K8S_DIR
               curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-              mkdir -p $(Pipeline.Workspace)/k8s
-              ./kustomize build k8s > $(Pipeline.Workspace)/k8s/depl.yaml
+              ./kustomize edit set image $K8S_DEFAULT_IMAGE $K8S_DEFAULT_IMAGE=$DOCKER_REGISTRY:$VERSION
+              ./kustomize build > $(Pipeline.Workspace)/$K8S_DIR/depl_$NAME_$VERSION.yaml
+
             displayName: 'Kustomize Build'
           # Publish the folder as pipeline artifact
           - publish: $(Pipeline.Workspace)/k8s
@@ -197,7 +200,7 @@ stages:
               jdkVersionOption: '$(JDK_VERSION)'
               jdkArchitectureOption: 'x64'
               goals: 'compile'
-              options: '-DskipTests -Drevision=$(VERSION) -Pjib -Dimage=$(name):$(VERSION)'
+              options: '-DskipTests -Drevision=$(VERSION) -Pjib -Dimage=$(NAME):$(VERSION)'
 
   # Tag only on master
   - stage: StageTag
