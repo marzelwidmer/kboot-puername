@@ -26,4 +26,3 @@ transformers:
 - github.com/marzelwidmer/kboot-bname/k8s/layers/actuator?ref=HEAD
 - github.com/marzelwidmer/kboot-bname/k8s/layers/limits?ref=HEAD
 
-

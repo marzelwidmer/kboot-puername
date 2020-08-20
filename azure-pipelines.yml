@@ -12,6 +12,7 @@ pool:
 variables:
   SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
   NAME: $(Build.DefinitionName)
+  K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
   K8S_DIR: 'k8s'
   DOCKER_REGISTRY: 'docker-registry.default.svc:5000/dev/kboot-bname-service'
 
@@ -62,19 +63,17 @@ stages:
 
           - bash: |
               echo $VERSION
-              mkdir -p $(Pipeline.Workspace)/$(K8S_DIR)
-              cd $(K8S_DIR)
+              mkdir -p $(Pipeline.Workspace)/$K8S_DIR
+              cd $K8S_DIR
 
               curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
 
-              echo "$(DOCKER_REGISTRY):$VERSION"
-              echo "$(K8S_DIR)"
+              echo "$DOCKER_REGISTRY:$VERSION"
+              echo "$K8S_DIR"
 
-              ./kustomize edit set image "$(DOCKER_REGISTRY):$VERSION"
-              cd ..
+              ./kustomize edit set image $K8S_DEFAULT_IMAGE $K8S_DEFAULT_IMAGE=$DOCKER_REGISTRY:$VERSION
 
-              curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-              ./kustomize build  $(K8S_DIR) > $(Pipeline.Workspace)/$(K8S_DIR)/depl_$NAME_$VERSION.yaml
+              ./kustomize build > $(Pipeline.Workspace)/$K8S_DIR/depl_$NAME_$VERSION.yaml
 
 
             displayName: 'Kustomize Build'
