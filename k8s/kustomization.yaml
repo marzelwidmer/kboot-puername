@@ -4,12 +4,6 @@ namePrefix: bname-
 
 namespace: dev
 
-#images:
-#  - name: c3smonkey/template
-##    newName: harbor.c3smonkey.ch/c3smonkey/kboot-bname-service
-#    newName: docker-registry.default.svc:5000/dev/kboot-bname-service
-#    newTag: latest
-
 commonLabels:
   app: bname-service
 
@@ -26,3 +20,10 @@ transformers:
 - github.com/marzelwidmer/kboot-bname/k8s/layers/actuator?ref=HEAD
 - github.com/marzelwidmer/kboot-bname/k8s/layers/limits?ref=HEAD
 
+# will be replaced in CI/CD with
+#     -> kustomize edit set image c3smonkey/template:latest c3smonkey/template=docker-registry.default.svc:5000/dev/kboot-bname:1.0.1_24221
+#images:
+#  - name: c3smonkey/template
+##    newName: harbor.c3smonkey.ch/c3smonkey/kboot-bname-service
+#    newName: docker-registry.default.svc:5000/dev/kboot-bname-service
+#    newTag: latest
