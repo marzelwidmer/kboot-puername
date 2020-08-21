@@ -151,27 +151,74 @@ stages:
               path: $(MAVEN_CACHE_FOLDER)
 
           # Sonar
-          - task: SonarCloudPrepare@1
-            inputs:
-              SonarCloud: '$(SONAR_CLOUD)'
-              organization:  '$(SONAR_ORGANIZATION)'
-              scannerMode: 'Other'
+#          - task: SonarCloudPrepare@1
+#            inputs:
+#              SonarCloud: '$(SONAR_CLOUD)'
+#              organization:  '$(SONAR_ORGANIZATION)'
+#              scannerMode: 'Other'
+
 
           # Maven package
+#          - task: Maven@3
+#            displayName: Test
+#            inputs:
+#              mavenPomFile: 'pom.xml'
+#              mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+#              mavenVersionOption: 'Default'
+#              javaHomeOption: 'JDKVersion'
+#              jdkVersionOption: '$(JDK_VERSION)'
+#              jdkArchitectureOption: 'x64'
+#              publishJUnitResults: true
+#              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+#              codeCoverageToolOption: JaCoCo
+#              goals: 'verify sonar:sonar'
+#              options: '-Drevision=$(VERSION) -Dsonar.organization=$(SONAR_ORGANIZATION) -Dsonar.url=$(SONAR_URL)'
+
+
+
+
+          - task: SonarCloudPrepare@1
+            displayName: 'Prepare analysis configuration'
+            inputs:
+              SonarCloud: '$(SONAR_CLOUD)'
+              organization: '$(SONAR_ORGANIZATION)'
+              scannerMode: 'Other'
+              # Additional properties that will be passed to the scanner,
+              # Put one key=value per line, example:
+              # sonar.exclusions=**/*.bin
+              extraProperties: |
+                sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/jacoco.xml
+                # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
+                # object model to provide smart defaults for most of the standard analysis parameters.
+                # You can however override this by setting wanted properties in this extraProperties space.
+                # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/#header-4
+
           - task: Maven@3
-            displayName: Test
+            displayName: 'Execute Maven goal verify'
             inputs:
               mavenPomFile: 'pom.xml'
+              options: '-Dmaven.test.failure.ignore=true'
               mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
               mavenVersionOption: 'Default'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '$(JDK_VERSION)'
               jdkArchitectureOption: 'x64'
               publishJUnitResults: true
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              sonarQubeRunAnalysis: true
+              sqMavenPluginVersionChoice: 'latest'
               codeCoverageToolOption: JaCoCo
-              goals: 'verify sonar:sonar'
-              options: '-Drevision=$(VERSION) -Dsonar.organization=$(SONAR_ORGANIZATION) -Dsonar.url=$(SONAR_URL)'
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              goals: 'verify'
+
+          # Uncomment the next task to wait until SonarCloud processing has
+          # finished and to publish the result on the Pipeline build summary
+          - task: SonarCloudPublish@1
+            displayName: 'Publish results on build summary'
+            inputs:
+              pollingTimeoutSec: '300'
+
 
 
   # Dockerize
