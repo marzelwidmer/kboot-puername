@@ -170,9 +170,8 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
               codeCoverageToolOption: JaCoCo
-              goals: 'verify'
-              options: '-Drevision=$(VERSION) -Dsonar.url=$(SONAR_URL)'
-
+              goals: 'verify sonar:sonar'
+              options: '-Drevision=$(VERSION) -Dsonar.organization=$(SONAR_ORGANIZATION) -Dsonar.url=$(SONAR_URL)'
 
 
   # Dockerize
