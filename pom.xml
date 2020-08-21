@@ -25,10 +25,10 @@
 		<!-- Jib -->
 		<jib.maven-plugin-version>2.5.2</jib.maven-plugin-version>
 		<jib.from.image>gcr.io/distroless/java:11</jib.from.image>
-<!--		<jib.from.image>openjdk:11.0.5-jre</jib.from.image>-->
 
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 		<sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
+		<maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -84,6 +84,14 @@
 			<version>${sonar-maven-plugin.version}</version>
 		</dependency>
 
+		<!-- https://repo.spring.io/libs-release -->
+		<!-- https://markusamshove.github.io/Kluent/ -->
+		<dependency>
+			<groupId>org.amshove.kluent</groupId>
+			<artifactId>kluent</artifactId>
+			<version>1.61</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -131,6 +139,11 @@
 				</dependencies>
 			</plugin>
 
+			<!-- surefire -->
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+			</plugin>
 			<!-- jacoco -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -194,4 +207,31 @@
 		</profile>
 	</profiles>
 
+
+
+	<repositories>
+		<repository>
+			<id>spring-release</id>
+			<url>https://repo.spring.io/libs-release</url>
+			<snapshots><enabled>false</enabled></snapshots>
+		</repository>
+		<repository>
+			<id>spring-milestone</id>
+			<url>https://repo.spring.io/libs-milestone</url>
+			<snapshots><enabled>false</enabled></snapshots>
+		</repository>
+		<repository>
+			<id>spring-snapshot</id>
+			<url>https://repo.spring.io/libs-snapshot</url>
+			<snapshots><enabled>true</enabled></snapshots>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>spring-release</id>
+			<url>https://repo.spring.io/libs-release</url>
+			<snapshots><enabled>false</enabled></snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
