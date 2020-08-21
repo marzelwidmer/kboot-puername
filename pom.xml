@@ -28,6 +28,7 @@
 <!--		<jib.from.image>openjdk:11.0.5-jre</jib.from.image>-->
 
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+		<sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -77,11 +78,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!--<dependency>
+		<dependency>
 			<groupId>org.sonarsource.scanner.maven</groupId>
 			<artifactId>sonar-maven-plugin</artifactId>
-			<version>3.4.1.1168</version>
-		</dependency>-->
+			<version>${sonar-maven-plugin.version}</version>
+		</dependency>
 
 	</dependencies>
 
