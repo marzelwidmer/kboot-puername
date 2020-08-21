@@ -12,7 +12,6 @@ pool:
 variables:
   SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
   NAME: $(Build.DefinitionName)
-  SONAR_ORGANIZATION: 'keepcalm'
   K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
   K8S_DIR: 'k8s'
   DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
@@ -147,12 +146,6 @@ stages:
                 maven
               path: $(MAVEN_CACHE_FOLDER)
 
-          - task: SonarCloudPrepare@1
-            inputs:
-              SonarCloud: 'sonarcloud'
-              organization: '$(SONAR_ORGANIZATION)'
-              scannerMode: 'Other'
-
           # Maven package
           - task: Maven@3
             displayName: Test
@@ -169,8 +162,6 @@ stages:
               goals: 'verify sonar:sonar'
               options: '-Drevision=$(VERSION)'
 
-          - task: SonarCloudAnalyze@1
-          - task: SonarCloudPublish@1
 
   # Dockerize
   - stage: StageDockerBuild
