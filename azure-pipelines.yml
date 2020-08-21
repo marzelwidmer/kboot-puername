@@ -12,7 +12,7 @@ pool:
 variables:
   SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
   NAME: $(Build.DefinitionName)
-  SONAR_ORGANIZATION:
+  SONAR_ORGANIZATION: 'keepcalm'
   K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
   K8S_DIR: 'k8s'
   DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
