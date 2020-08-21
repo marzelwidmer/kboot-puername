@@ -109,7 +109,7 @@ stages:
               path: $(MAVEN_CACHE_FOLDER)
           # Maven package
           - task: Maven@3
-            displayName: Package
+            displayName: 'Execute Maven goal clean package'
             inputs:
               mavenPomFile: 'pom.xml'
               mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
