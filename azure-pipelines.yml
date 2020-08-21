@@ -211,7 +211,7 @@ stages:
               sqMavenPluginVersionChoice: 'latest'
               codeCoverageToolOption: JaCoCo
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'verify sonar:sonar'
+              goals: 'verify sonar:sonar -X'
 
           # Uncomment the next task to wait until SonarCloud processing has
           # finished and to publish the result on the Pipeline build summary
