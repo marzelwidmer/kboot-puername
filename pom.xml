@@ -26,6 +26,8 @@
 		<jib.maven-plugin-version>2.5.2</jib.maven-plugin-version>
 		<jib.from.image>gcr.io/distroless/java:11</jib.from.image>
 <!--		<jib.from.image>openjdk:11.0.5-jre</jib.from.image>-->
+
+		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -75,20 +77,10 @@
 			<scope>test</scope>
 		</dependency>
 
-
-
-
-		<dependency>
-			<groupId>org.sonarsource.scanner.maven</groupId>
-			<artifactId>sonar-maven-plugin</artifactId>
-			<version>3.4.1.1168</version>
-		</dependency>
-
-
 		<dependency>
 			<groupId>org.jacoco</groupId>
 			<artifactId>jacoco-maven-plugin</artifactId>
-			<version>0.8.5</version>
+			<version>${jacoco-maven-plugin.version}</version>
 		</dependency>
 
 
