@@ -12,9 +12,13 @@ pool:
 variables:
   SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
   NAME: $(Build.DefinitionName)
+
+  SONAR_ORGANIZATION: 'keepcalm'
+  SONAR_CLOUD: 'azure-c3smonkey'
+
   K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
   K8S_DIR: 'k8s'
-  DOCKER_REGISTRY: 'docker-registry.default.svc:5000/dev/kboot-bname-service'
+  DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
 
 stages:
   # SemVer
@@ -64,7 +68,7 @@ stages:
               mkdir -p $(Pipeline.Workspace)/$K8S_DIR
               cd $K8S_DIR
               curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-              ./kustomize edit set image $K8S_DEFAULT_IMAGE $K8S_DEFAULT_IMAGE=$DOCKER_REGISTRY:$VERSION
+              ./kustomize edit set image $K8S_DEFAULT_IMAGE $K8S_DEFAULT_IMAGE=$DOCKER_REGISTRY/$NAME:$VERSION
               ./kustomize build > $(Pipeline.Workspace)/$K8S_DIR/depl_$NAME_$VERSION.yaml
 
             displayName: 'Kustomize Build'
@@ -89,6 +93,7 @@ stages:
           # Download the artifacts
           - download: current
             artifact: variables
+            displayName: 'Download variables'
           # Read the variable from the file, then expose it in the job
           - bash: |
               VERSION=$(cat $(Pipeline.Workspace)/variables/VERSION)
@@ -105,7 +110,7 @@ stages:
               path: $(MAVEN_CACHE_FOLDER)
           # Maven package
           - task: Maven@3
-            displayName: Package
+            displayName: 'Execute Maven goal clean package'
             inputs:
               mavenPomFile: 'pom.xml'
               mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
@@ -146,17 +151,51 @@ stages:
                 maven
               path: $(MAVEN_CACHE_FOLDER)
 
-          # Maven package
+          # Sonar
+          - task: SonarCloudPrepare@1
+            displayName: 'Prepare analysis configuration'
+            inputs:
+              SonarCloud: '$(SONAR_CLOUD)'
+              organization: '$(SONAR_ORGANIZATION)'
+              scannerMode: 'Other'
+              # Additional properties that will be passed to the scanner,
+              # Put one key=value per line, example:
+              # sonar.exclusions=**/*.bin
+              extraProperties: |
+                sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/jacoco.xml
+                # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
+                # object model to provide smart defaults for most of the standard analysis parameters.
+                # You can however override this by setting wanted properties in this extraProperties space.
+                # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/#header-4
+
+          # Maven verify
           - task: Maven@3
-            displayName: Test
+            displayName: 'Execute Maven goal verify'
             inputs:
               mavenPomFile: 'pom.xml'
+              options: '-Dmaven.test.failure.ignore=true'
               mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+              mavenVersionOption: 'Default'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '$(JDK_VERSION)'
               jdkArchitectureOption: 'x64'
-              goals: 'test'
-              options: '-Drevision=$(VERSION)'
+              publishJUnitResults: true
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              sonarQubeRunAnalysis: true
+              sqMavenPluginVersionChoice: 'latest'
+              codeCoverageToolOption: JaCoCo
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              goals: 'verify sonar:sonar -X'
+
+          # Uncomment the next task to wait until SonarCloud processing has
+          # finished and to publish the result on the Pipeline build summary
+          - task: SonarCloudPublish@1
+            displayName: 'Publish results on build summary'
+            inputs:
+              pollingTimeoutSec: '300'
+
+
 
   # Dockerize
   - stage: StageDockerBuild
