@@ -156,7 +156,7 @@ stages:
               jdkVersionOption: '$(JDK_VERSION)'
               jdkArchitectureOption: 'x64'
               goals: 'test'
-              options: '-Drevision=$(VERSION)'
+              options: '-Drevision=$(VERSION) -Dsonar.coverage.jacoco.xmlReportPaths=//jacoco.xml'
 
   # Dockerize
   - stage: StageDockerBuild
