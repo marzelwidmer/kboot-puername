@@ -24,7 +24,7 @@
 
 		<!-- Jib -->
 		<jib.maven-plugin-version>2.5.2</jib.maven-plugin-version>
-		<jib.from.image>gcr.io/distroless/java:11</jib.from.image>
+		<jib.from.image>gcr.io/distroless/java@sha256:7fc091e8686df11f7bf0b7f67fd7da9862b2b9a3e49978d1184f0ff62cb673cc</jib.from.image>
 
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 		<sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
