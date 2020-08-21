@@ -12,6 +12,8 @@ pool:
 variables:
   SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
   NAME: $(Build.DefinitionName)
+  SONAR_ORGANIZATION: 'keepcalm'
+  SONAR_URL: "https://sonarcloud.io"
   K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
   K8S_DIR: 'k8s'
   DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
@@ -160,8 +162,7 @@ stages:
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
               codeCoverageToolOption: JaCoCo
               goals: 'verify sonar:sonar'
-              options: '-Drevision=$(VERSION)'
-
+              options: '-Drevision=$(VERSION) -Dsonar.host.url=$(SONAR_URL) -Dsonar.organization=$(SONAR_ORGANIZATION)'
 
   # Dockerize
   - stage: StageDockerBuild
