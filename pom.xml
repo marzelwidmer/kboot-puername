@@ -28,7 +28,10 @@
 
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
 		<sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
-		<maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
+		<maven-surefire-plugin.version>${maven-failsafe-plugin.version}</maven-surefire-plugin.version>
+		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+		<hamkrest.version>1.7.0.3</hamkrest.version>
+		<kluent.version>1.61</kluent.version>
 	</properties>
 
 	<dependencies>
@@ -61,6 +64,15 @@
 			<artifactId>kotlinx-coroutines-reactor</artifactId>
 		</dependency>
 
+		<!-- Hamcrest for Kotlin -->
+		<dependency>
+			<groupId>com.natpryce</groupId>
+			<artifactId>hamkrest</artifactId>
+			<version>${hamkrest.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -89,7 +101,7 @@
 		<dependency>
 			<groupId>org.amshove.kluent</groupId>
 			<artifactId>kluent</artifactId>
-			<version>1.61</version>
+			<version>${kluent.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -143,6 +155,11 @@
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
+			</plugin>
+			<!-- failsafe -->
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>${maven-failsafe-plugin.version}</version>
 			</plugin>
 			<!-- jacoco -->
 			<plugin>
