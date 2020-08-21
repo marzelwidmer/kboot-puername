@@ -93,6 +93,7 @@ stages:
           # Download the artifacts
           - download: current
             artifact: variables
+            displayName: 'Download variables'
           # Read the variable from the file, then expose it in the job
           - bash: |
               VERSION=$(cat $(Pipeline.Workspace)/variables/VERSION)
@@ -210,7 +211,7 @@ stages:
               sqMavenPluginVersionChoice: 'latest'
               codeCoverageToolOption: JaCoCo
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'verify'
+              goals: 'verify sonar:sonar'
 
           # Uncomment the next task to wait until SonarCloud processing has
           # finished and to publish the result on the Pipeline build summary
