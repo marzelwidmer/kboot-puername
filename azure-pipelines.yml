@@ -12,6 +12,7 @@ pool:
 variables:
   SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
   NAME: $(Build.DefinitionName)
+  SONAR_ORGANIZATION:
   K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
   K8S_DIR: 'k8s'
   DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
@@ -146,17 +147,30 @@ stages:
                 maven
               path: $(MAVEN_CACHE_FOLDER)
 
+          - task: SonarCloudPrepare@1
+            inputs:
+              SonarCloud: 'sonarcloud'
+              organization: '$(SONAR_ORGANIZATION)'
+              scannerMode: 'Other'
+
           # Maven package
           - task: Maven@3
             displayName: Test
             inputs:
               mavenPomFile: 'pom.xml'
               mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+              mavenVersionOption: 'Default'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '$(JDK_VERSION)'
               jdkArchitectureOption: 'x64'
-              goals: 'test'
-              options: '-Drevision=$(VERSION) -Dsonar.coverage.jacoco.xmlReportPaths=$(System.DefaultWorkingDirectory)\CCReport43F6D5EF\jacoco.xml'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              codeCoverageToolOption: JaCoCo
+              goals: 'verify sonar:sonar'
+              options: '-Drevision=$(VERSION)'
+
+          - task: SonarCloudAnalyze@1
+          - task: SonarCloudPublish@1
 
   # Dockerize
   - stage: StageDockerBuild
