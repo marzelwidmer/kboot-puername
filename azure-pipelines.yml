@@ -13,7 +13,7 @@ variables:
   GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
   JDK_VERSION: '1.11'
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-  MAVEN_OPTS: '-B -e -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
 
   SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
   NAME: $(Build.DefinitionName)
