@@ -161,7 +161,7 @@ stages:
   # Kustomize
   - stage: StageKustomize
     displayName: 'Kustomize'
-    dependsOn: StageVersion, StageTest
+    dependsOn: StageTest
     jobs:
       - job: BuildKustomize
         displayName: 'Kustomize Build'
