@@ -124,10 +124,6 @@ stages:
   - stage: StageTest
     displayName: 'Test Artifact'
     dependsOn: StageBuild
-    variables:
-      JDK_VERSION: '1.11'
-      MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-      MAVEN_OPTS: '-B -e -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
     jobs:
       - job: Test
         pool:
@@ -185,7 +181,7 @@ stages:
               sqMavenPluginVersionChoice: 'latest'
               codeCoverageToolOption: JaCoCo
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'verify sonar:sonar -X'
+              goals: 'verify sonar:sonar -Drevision=$(VERSION)'
 
           # Uncomment the next task to wait until SonarCloud processing has
           # finished and to publish the result on the Pipeline build summary
