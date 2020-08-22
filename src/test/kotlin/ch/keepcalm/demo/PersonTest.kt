@@ -2,33 +2,32 @@ package ch.keepcalm.demo
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 
 class PersonTest {
 
-    @Test
-    fun `Person creation test - it must have a valid gender M 🧔`() {
-        Person(name = "Basco", gender = 'M')
-    }
-
-    @Test
-    fun `Person creation test - gender X is not allowed `() {
+    @ParameterizedTest(name = "{index} negative test gender {0}")
+    @ValueSource(chars = ['A','B'])
+    fun `Person negative creation test - only gender M od F is allowed `(input: Char) {
         Assertions.assertThrows(IllegalStateException::class.java) {
-            Person(name = "Diana", gender = 'X')
+            Person(name = "Kim", gender = input)
 
         }
     }
 
-    @Test
-    fun `Person creation test - it must have a valid gender F 👧`() {
-        Person(name = "Diana", gender = 'F')
+    @ParameterizedTest(name = "{index} test gender {0}")
+    @ValueSource(chars = ['F','M'])
+    fun `Person creation test - it must have a valid gender F 👧 or M 🧔`(input: Char) {
+        Person(name = "Kim", gender = input)
     }
 
-    @Test
-    fun `Person creation test - gender have to be capital`() {
+    @ParameterizedTest(name = "{index} negative test gender {0}")
+    @ValueSource(chars = ['f','m'])
+    fun `Person creation test - gender have to be capital`(input: Char) {
         Assertions.assertThrows(IllegalStateException::class.java) {
-            Person(name = "Diana", gender = 'f')
-
+            Person(name = "Kim", gender = input)
         }
     }
 }
