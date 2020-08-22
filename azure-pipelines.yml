@@ -228,7 +228,7 @@ stages:
 
   # Tag only on master
   - stage: StageTag
-    displayName: 'Create Tag'
+    displayName: 'Create Tag on Git Repository'
     condition: and(contains(variables['build.sourceBranch'], 'refs/heads/master'), succeeded())
     dependsOn: StageDockerBuild
     jobs:
