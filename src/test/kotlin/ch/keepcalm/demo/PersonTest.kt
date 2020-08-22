@@ -1,30 +1,34 @@
 package ch.keepcalm.demo
 
-import org.amshove.kluent.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+
 
 class PersonTest {
 
-    private val malePerson = Person(name = "Basco", gender = 'M')
-
     @Test
-    fun `person is not null`(){
-        malePerson.`should not be null`()
+    fun `Person creation test - it must have a valid gender M 🧔`() {
+        Person(name = "Basco", gender = 'M')
     }
 
     @Test
-    fun `name of a person is not empty`(){
-        malePerson.name.`should not be null or empty`()
+    fun `Person creation test - gender X is not allowed `() {
+        Assertions.assertThrows(IllegalStateException::class.java) {
+            Person(name = "Diana", gender = 'X')
+
+        }
     }
 
     @Test
-    fun `male person must have a gender M`(){
-        malePerson.gender.`should not be digit`()
-        malePerson.gender.shouldBe('M')
+    fun `Person creation test - it must have a valid gender F 👧`() {
+        Person(name = "Diana", gender = 'F')
     }
+
     @Test
-    fun `male person do not have a gender F`(){
-        malePerson.gender.`should not be digit`()
-        malePerson.gender.shouldNotBe('F')
+    fun `Person creation test - gender have to be capital`() {
+        Assertions.assertThrows(IllegalStateException::class.java) {
+            Person(name = "Diana", gender = 'f')
+
+        }
     }
 }
