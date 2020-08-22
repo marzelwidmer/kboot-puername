@@ -56,8 +56,6 @@ stages:
     dependsOn: StageVersion
     jobs:
       - job: BuildKustomize
-        pool:
-          vmImage: 'ubuntu-latest'
         displayName: 'Kustomize Build'
         steps:
           # Download the artifacts
@@ -87,8 +85,6 @@ stages:
     dependsOn: StageVersion
     jobs:
       - job: Package
-        pool:
-          vmImage: 'ubuntu-latest'
         steps:
           # Download the artifacts
           - download: current
@@ -126,8 +122,6 @@ stages:
     dependsOn: StageBuild
     jobs:
       - job: Test
-        pool:
-          vmImage: 'ubuntu-latest'
         steps:
           # Download the artifacts
           - download: current
@@ -200,8 +194,6 @@ stages:
     dependsOn: StageTest
     jobs:
       - job: BuildDockerImage
-        pool:
-          vmImage: 'ubuntu-latest'
         displayName: 'Build Docker Image'
         steps:
           # Download the artifacts
@@ -241,8 +233,6 @@ stages:
     dependsOn: StageDockerBuild
     jobs:
       - job: BuildDockerImage
-        pool:
-          vmImage: 'ubuntu-latest'
         displayName: 'Tag Git'
         steps:
           # Download the artifacts
