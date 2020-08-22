@@ -10,6 +10,11 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
+  GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
+  JDK_VERSION: '1.11'
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: '-B -e -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
   SEMVER_SHORTSHA_BUILDID: $(GitVersion.SemVer)_$(GitVersion.ShortSha)_$(Build.BuildID)
   NAME: $(Build.DefinitionName)
 
@@ -80,11 +85,6 @@ stages:
   - stage: StageBuild
     displayName: 'Build Artifact'
     dependsOn: StageVersion
-    variables:
-      GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
-      JDK_VERSION: '1.11'
-      MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-      MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
     jobs:
       - job: Package
         pool:
@@ -127,7 +127,7 @@ stages:
     variables:
       JDK_VERSION: '1.11'
       MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-      MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+      MAVEN_OPTS: '-B -e -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
     jobs:
       - job: Test
         pool:
@@ -173,7 +173,6 @@ stages:
             displayName: 'Execute Maven goal verify'
             inputs:
               mavenPomFile: 'pom.xml'
-              options: '-Dmaven.test.failure.ignore=true'
               mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
               mavenVersionOption: 'Default'
               javaHomeOption: 'JDKVersion'
@@ -201,10 +200,6 @@ stages:
   - stage: StageDockerBuild
     displayName: 'Build Docker Image'
     dependsOn: StageTest
-    variables:
-      JDK_VERSION: '1.11'
-      MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-      MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
     jobs:
       - job: BuildDockerImage
         pool:
