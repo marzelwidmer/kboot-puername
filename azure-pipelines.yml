@@ -159,6 +159,8 @@ stages:
               # sonar.exclusions=**/*.bin
               extraProperties: |
                 sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/jacoco.xml
+                sonar.exclusions=src/main/test/*
+
                 # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
                 # object model to provide smart defaults for most of the standard analysis parameters.
                 # You can however override this by setting wanted properties in this extraProperties space.
