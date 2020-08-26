@@ -1,16 +1,8 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
   - /**
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
-  GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
+  GIT_VERSION_CONFIGURATION: './ci/GitVersion.yaml'
   JDK_VERSION: '1.11'
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
   MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
@@ -25,235 +17,51 @@ variables:
   K8S_DIR: 'k8s'
   DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
 
-stages:
+jobs:
+  # Semantic Version
+  - job: SemVer
+    displayName: "Semantic Version - Semantic Release"
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - template: ci/templates/semver-steps.yaml
 
-  - stage: Deploy
-    jobs:
-      - job: approval
-        steps:
-          - task: ManualValidation@0
-            inputs:
-              onTimeout: 'resume'
+  # Maven Build Test and Sonar
+  - job: Build
+    dependsOn: SemVer
+    displayName: "Build and Test Maven Artifact"
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - template: ci/templates/sonar-prepare-steps.yaml
+      - template: ci/templates/maven-build-steps.yaml
+      - template: ci/templates/sonar-publish-steps.yaml
 
-  # SemVer
-  - stage: StageVersion
-    displayName: 'Semantic Version'
-    variables:
-      GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
-    jobs:
-      - job: SemVer
-        displayName: 'Semantic Version'
-        steps:
-          - task: UseGitVersion@5
-            displayName: 'Semantic Version'
-            inputs:
-              versionSpec: '5.x'
-              includePrerelease: true
-              useConfigFile: true
-              configFilePath: '$(GIT_VERSION_CONFIGURATION)'
-          - bash: |
-              mkdir -p $(Pipeline.Workspace)/variables
-              echo "$(SEMVER_SHORTSHA_BUILDID)" > $(Pipeline.Workspace)/variables/VERSION
-            displayName: 'Save Version'
-            # Publish the folder as pipeline artifact
-          - publish: $(Pipeline.Workspace)/variables
-            artifact: variables
-
-  # Build
-  - stage: StageBuild
-    displayName: 'Build Artifact'
-    dependsOn: StageVersion
-    jobs:
-      - job: Package
-        steps:
-          # Download the artifacts
-          - download: current
-            artifact: variables
-            displayName: 'Download variables'
-          # Read the variable from the file, then expose it in the job
-          - bash: |
-              VERSION=$(cat $(Pipeline.Workspace)/variables/VERSION)
-              echo "##vso[task.setvariable variable=VERSION]$VERSION"
-            displayName: 'Read variable and expose in the job.'
-          # Maven Cache
-          - task: Cache@2
-            displayName: Cache Maven local repo
-            inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(MAVEN_CACHE_FOLDER)
-          # Maven package
-          - task: Maven@3
-            displayName: 'Execute Maven goal clean package'
-            inputs:
-              mavenPomFile: 'pom.xml'
-              mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
-              javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '$(JDK_VERSION)'
-              jdkArchitectureOption: 'x64'
-              goals: 'clean package'
-              options: '-Drevision=$(VERSION) -DskipTests'
-
-  # Test
-  - stage: StageTest
-    displayName: 'Test Artifact'
-    dependsOn: StageBuild
-    jobs:
-      - job: Test
-        steps:
-          # Download the artifacts
-          - download: current
-            artifact: variables
-          # Read the variable from the file, then expose it in the job
-          - bash: |
-              VERSION=$(cat $(Pipeline.Workspace)/variables/VERSION)
-              echo "##vso[task.setvariable variable=VERSION]$VERSION"
-            displayName: 'Read variable and expose in the job.'
-          # Maven Cache
-          - task: Cache@2
-            displayName: Cache Maven local repo
-            inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(MAVEN_CACHE_FOLDER)
-
-          # Sonar
-          - task: SonarCloudPrepare@1
-            displayName: 'Prepare analysis configuration'
-            inputs:
-              SonarCloud: '$(SONAR_CLOUD)'
-              organization: '$(SONAR_ORGANIZATION)'
-              scannerMode: 'Other'
-              # Additional properties that will be passed to the scanner,
-              # Put one key=value per line, example:
-              # sonar.exclusions=**/*.bin
-              extraProperties: |
-                sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/jacoco.xml
-                sonar.exclusions=src/main/test/**
-
-                # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
-                # object model to provide smart defaults for most of the standard analysis parameters.
-                # You can however override this by setting wanted properties in this extraProperties space.
-                # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/#header-4
-
-          # Maven verify
-          - task: Maven@3
-            displayName: 'Execute Maven goal verify'
-            inputs:
-              mavenPomFile: 'pom.xml'
-              mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
-              mavenVersionOption: 'Default'
-              javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '$(JDK_VERSION)'
-              jdkArchitectureOption: 'x64'
-              publishJUnitResults: true
-              mavenAuthenticateFeed: false
-              effectivePomSkip: false
-              sonarQubeRunAnalysis: true
-              sqMavenPluginVersionChoice: 'latest'
-              codeCoverageToolOption: JaCoCo
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'verify sonar:sonar -Drevision=$(VERSION)'
-
-          # Uncomment the next task to wait until SonarCloud processing has
-          # finished and to publish the result on the Pipeline build summary
-          - task: SonarCloudPublish@1
-            displayName: 'Publish results on build summary'
-            inputs:
-              pollingTimeoutSec: '300'
-
-
-      # Kustomize
-  - stage: StageKustomize
-    displayName: 'Kustomize'
-    dependsOn: StageTest
-    jobs:
-      - job: BuildKustomize
-        displayName: 'Kustomize Build'
-        steps:
-          # Download the artifacts
-          - download: current
-            artifact: variables
-          # Read the variable from the file, then expose it in the job
-          - bash: |
-              VERSION=$(cat $(Pipeline.Workspace)/variables/VERSION)
-              echo "##vso[task.setvariable variable=VERSION]$VERSION"
-            displayName: 'Read variable and expose in the job.'
-
-          - bash: |
-              mkdir -p $(Pipeline.Workspace)/$K8S_DIR
-              cd $K8S_DIR
-              curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-              ./kustomize edit set image $K8S_DEFAULT_IMAGE $K8S_DEFAULT_IMAGE=$DOCKER_REGISTRY/$NAME:$VERSION
-              ./kustomize build > $(Pipeline.Workspace)/$K8S_DIR/depl_$NAME_$VERSION.yaml
-
-            displayName: 'Kustomize Build'
-          # Publish the folder as pipeline artifact
-          - publish: $(Pipeline.Workspace)/k8s
-            artifact: k8s
-
-
-  # Dockerize
-  - stage: StageDockerBuild
+  # Maven Build Docker
+  - job: BuildDockerImage
+    dependsOn: Build
     displayName: 'Build Docker Image'
-    dependsOn: StageTest
-    jobs:
-      - job: BuildDockerImage
-        displayName: 'Build Docker Image'
-        steps:
-          # Download the artifacts
-          - download: current
-            artifact: variables
-          # Read the variable from the file, then expose it in the job
-          - bash: |
-              VERSION=$(cat $(Pipeline.Workspace)/variables/VERSION)
-              echo "##vso[task.setvariable variable=VERSION]$VERSION"
-            displayName: 'Read variable and expose in the job.'
-          # Maven Cache
-          - task: Cache@2
-            displayName: Cache Maven local repo
-            inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(MAVEN_CACHE_FOLDER)
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - template: ci/templates/maven-docker-build-steps.yaml
 
-          # Maven create docker image
-          - task: Maven@3
-            displayName: Build Docker Iamge
-            inputs:
-              mavenPomFile: 'pom.xml'
-              mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
-              javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '$(JDK_VERSION)'
-              jdkArchitectureOption: 'x64'
-              goals: 'compile'
-              options: '-DskipTests -Drevision=$(VERSION) -Pjib -Dimage=$(NAME):$(VERSION)'
+  # Maven Build Docker
+  - job: BuildKustomize
+    dependsOn: SemVer
+    displayName: 'Kustomize Build'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - template: ci/templates/kustomize-build-steps.yaml
 
-  # Tag only on master
-  - stage: StageTag
+  # Tag Git Repo
+  - job: TagGitRepo
+    dependsOn: Build
     displayName: 'Create Tag on Git Repository'
     condition: and(contains(variables['build.sourceBranch'], 'refs/heads/master'), succeeded())
-    dependsOn: StageDockerBuild
-    jobs:
-      - job: BuildDockerImage
-        displayName: 'Tag Git'
-        steps:
-          # Download the artifacts
-          - download: current
-            artifact: variables
-          # Read the variable from the file, then expose it in the job
-          - bash: |
-              VERSION=$(cat $(Pipeline.Workspace)/variables/VERSION)
-              echo "##vso[task.setvariable variable=VERSION]$VERSION"
-            displayName: 'Read variable and expose in the job.'
-          - task: git-tag-on-release-task@9
-            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-            displayName: "Add Tag to git"
-            inputs:
-              staticTagName: "$(VERSION)"
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - template: ci/templates/git-tag-repository-steps.yaml
+

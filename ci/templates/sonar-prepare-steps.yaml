@@ -1,0 +1,19 @@
+steps:
+  # Sonar
+  - task: SonarCloudPrepare@1
+    displayName: 'Sonar prepare analysis configuration'
+    inputs:
+      SonarCloud: '$(SONAR_CLOUD)'
+      organization: '$(SONAR_ORGANIZATION)'
+      scannerMode: 'Other'
+      # Additional properties that will be passed to the scanner,
+      # Put one key=value per line, example:
+      # sonar.exclusions=**/*.bin
+      extraProperties: |
+        sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/jacoco.xml
+        sonar.exclusions=src/main/test/**
+
+        # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
+        # object model to provide smart defaults for most of the standard analysis parameters.
+        # You can however override this by setting wanted properties in this extraProperties space.
+        # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/#header-4

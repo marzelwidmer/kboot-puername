@@ -1,0 +1,51 @@
+steps:
+  # Download the artifacts
+  - download: current
+    artifact: variables
+    displayName: 'Download variables'
+  # Read the variable from the file, then expose it in the job
+  - bash: |
+      VERSION=$(cat $(Pipeline.Workspace)/variables/VERSION)
+      echo "##vso[task.setvariable variable=VERSION]$VERSION"
+    displayName: 'Read variable and expose in the job.'
+
+  # Maven Cache
+  - task: Cache@2
+    displayName: Cache Maven local repo
+    inputs:
+      key: 'maven | "$(Agent.OS)" | **/pom.xml'
+      restoreKeys: |
+        maven | "$(Agent.OS)"
+        maven
+      path: $(MAVEN_CACHE_FOLDER)
+
+  # Maven package -DskipTests
+  - task: Maven@3
+    displayName: 'Execute Maven goal clean package'
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '$(JDK_VERSION)'
+      jdkArchitectureOption: 'x64'
+      goals: 'clean package'
+      options: '-Drevision=$(VERSION) -DskipTests'
+
+  # Maven verify
+  - task: Maven@3
+    displayName: 'Execute Maven goal verify'
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+      mavenVersionOption: 'Default'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '$(JDK_VERSION)'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: true
+      sqMavenPluginVersionChoice: 'latest'
+      codeCoverageToolOption: JaCoCo
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      goals: 'verify sonar:sonar -Drevision=$(VERSION)'

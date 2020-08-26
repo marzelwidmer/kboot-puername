@@ -1,0 +1,15 @@
+steps:
+  - task: UseGitVersion@5
+    displayName: 'Semantic Version'
+    inputs:
+      versionSpec: '5.x'
+      includePrerelease: true
+      useConfigFile: true
+      configFilePath: '$(GIT_VERSION_CONFIGURATION)'
+  - bash: |
+      mkdir -p $(Pipeline.Workspace)/variables
+      echo "$(SEMVER_SHORTSHA_BUILDID)" > $(Pipeline.Workspace)/variables/VERSION
+    displayName: 'Save Version'
+    # Publish the folder as pipeline artifact
+  - publish: $(Pipeline.Workspace)/variables
+    artifact: variables
