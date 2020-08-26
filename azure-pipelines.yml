@@ -164,8 +164,8 @@ stages:
     jobs:
       - job: BuildKustomize
         displayName: 'Kustomize Build'
+        environment: 'ApprovalRequired'
         steps:
-          - task ManualIntervention@8
           # Download the artifacts
           - download: current
             artifact: variables
