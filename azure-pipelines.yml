@@ -31,9 +31,9 @@ stages:
     jobs:
       - job: approval
         steps:
-          - task: ManualIntervention@8
+          - task: ManualValidation@0
             inputs:
-              instructions: 'reject or resume'
+              onTimeout: 'resume'
 
   # SemVer
   - stage: StageVersion
