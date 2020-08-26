@@ -157,7 +157,6 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
 
-
   # Kustomize
   - stage: StageKustomize
     displayName: 'Kustomize'
@@ -166,6 +165,7 @@ stages:
       - job: BuildKustomize
         displayName: 'Kustomize Build'
         steps:
+          - task ManualIntervention@8
           # Download the artifacts
           - download: current
             artifact: variables
@@ -248,12 +248,3 @@ stages:
             displayName: "Add Tag to git"
             inputs:
               staticTagName: "$(VERSION)"
-
-
-
-
-
-
-
-
-
