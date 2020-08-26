@@ -164,7 +164,6 @@ stages:
     jobs:
       - job: BuildKustomize
         displayName: 'Kustomize Build'
-        environment: 'ApprovalRequired'
         steps:
           # Download the artifacts
           - download: current
