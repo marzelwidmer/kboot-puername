@@ -26,6 +26,15 @@ variables:
   DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
 
 stages:
+
+  - stage: Deploy
+    jobs:
+      - job: approval
+        steps:
+          - task: ManualIntervention@8
+            inputs:
+              instructions: 'reject or resume'
+
   # SemVer
   - stage: StageVersion
     displayName: 'Semantic Version'
@@ -157,21 +166,6 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
 
-  - stage: Deploy
-    jobs:
-      - job: approval
-        pool: server
-        steps:
-          - task: ManualIntervention@8
-            inputs:
-              instructions: 'reject or resume'
-      - job: deploy
-        dependsOn: approval
-        pool:
-          vmImage: 'Ubuntu-16.04'
-        steps:
-          - bash: echo 'deploying'
-            displayName: 'deploying'
 
       # Kustomize
   - stage: StageKustomize
