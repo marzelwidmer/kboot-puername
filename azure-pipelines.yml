@@ -157,7 +157,23 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
 
-  # Kustomize
+  - stage: Deploy
+    jobs:
+      - job: approval
+        pool: server
+        steps:
+          - task: ManualIntervention@8
+            inputs:
+              instructions: 'reject or resume'
+      - job: deploy
+        dependsOn: approval
+        pool:
+          vmImage: 'Ubuntu-16.04'
+        steps:
+          - bash: echo 'deploying'
+            displayName: 'deploying'
+
+      # Kustomize
   - stage: StageKustomize
     displayName: 'Kustomize'
     dependsOn: StageTest
