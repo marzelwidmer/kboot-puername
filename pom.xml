@@ -63,7 +63,14 @@
 			<groupId>org.jetbrains.kotlinx</groupId>
 			<artifactId>kotlinx-coroutines-reactor</artifactId>
 		</dependency>
+		<!-- MongoDB		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+		</dependency>
 
+
+		<!--	TEST	-->
 		<!-- Hamcrest for Kotlin -->
 		<dependency>
 			<groupId>com.natpryce</groupId>
@@ -72,6 +79,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- MongoDB-->
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -153,11 +166,13 @@
 
 			<!-- surefire -->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 			</plugin>
 			<!-- failsafe -->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${maven-failsafe-plugin.version}</version>
 			</plugin>
