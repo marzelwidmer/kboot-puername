@@ -35,7 +35,7 @@ jobs:
     steps:
       - template: ci/templates/sonar-prepare-steps.yaml
       - template: ci/templates/maven-build-steps.yaml
-      - template: ci/templates/maven-integration-test-steps.yaml
+      - template: ci/templates/maven-integrations-test-steps.yaml
       - template: ci/templates/maven-sonar-steps.yaml.yaml
       - template: ci/templates/sonar-publish-steps.yaml
 
