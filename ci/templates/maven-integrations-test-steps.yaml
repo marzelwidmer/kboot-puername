@@ -36,6 +36,6 @@ steps:
       sqMavenPluginVersionChoice: 'latest'
       codeCoverageToolOption: JaCoCo
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
-      goals: 'verify -Drevision=$(VERSION)'
+      goals: 'verify'
       options: '-Drevision=$(VERSION) -P integration-test'
 
