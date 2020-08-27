@@ -38,7 +38,7 @@ class PersonMongoDbTestIT @Autowired constructor(private val repository: PersonR
         StepVerifier.withVirtualTime {
             repository.save(PersonDocument(firstName = "Bill"))
         }.assertNext{
-            "Bills" shouldBeEqualTo it.firstName
+            "Bill" shouldBeEqualTo it.firstName
             it.id.shouldNotBeNull()
         }.verifyComplete()
     }
