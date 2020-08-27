@@ -32,6 +32,7 @@
 		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
 		<hamkrest.version>1.7.0.3</hamkrest.version>
 		<kluent.version>1.61</kluent.version>
+		<testcontainers.version>1.14.3</testcontainers.version>
 	</properties>
 
 	<dependencies>
@@ -63,26 +64,48 @@
 			<groupId>org.jetbrains.kotlinx</groupId>
 			<artifactId>kotlinx-coroutines-reactor</artifactId>
 		</dependency>
-		<!-- MongoDB		-->
+		<!-- MongoDB -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
 		</dependency>
 
 
-		<!--	TEST	-->
+		<!-- TEST -->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!-- MongoDB embed -->
+		<!--<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<scope>test</scope>
+		</dependency>-->
+		<!-- MongoDB -->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mongodb</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+
 		<!-- Hamcrest for Kotlin -->
 		<dependency>
 			<groupId>com.natpryce</groupId>
 			<artifactId>hamkrest</artifactId>
 			<version>${hamkrest.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- MongoDB-->
-		<dependency>
-			<groupId>de.flapdoodle.embed</groupId>
-			<artifactId>de.flapdoodle.embed.mongo</artifactId>
 			<scope>test</scope>
 		</dependency>
 
