@@ -1,7 +1,7 @@
 package ch.keepcalm.demo.model
 
 // Domain Primitive
-class FirstName private constructor(private val value: String) {
+data class FirstName private constructor(val value: String) {
     companion object {
         // Create Object
         operator fun invoke(value: String) = FirstName(validate(value))
