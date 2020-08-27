@@ -11,7 +11,7 @@ steps:
 
   # Maven Cache
   - task: Cache@2
-    displayName: 'Cache Maven local repo'
+    displayName: Cache Maven local repo
     inputs:
       key: 'maven | "$(Agent.OS)" | **/pom.xml'
       restoreKeys: |
@@ -19,21 +19,9 @@ steps:
         maven
       path: $(MAVEN_CACHE_FOLDER)
 
-  # Maven package -DskipTests
-  - task: Maven@3
-    displayName: 'Maven goal clean package'
-    inputs:
-      mavenPomFile: 'pom.xml'
-      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
-      javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '$(JDK_VERSION)'
-      jdkArchitectureOption: 'x64'
-      goals: 'package'
-      options: '-Drevision=$(VERSION) -DskipTests'
-
   # Maven verify
   - task: Maven@3
-    displayName: 'Execute Maven goal verify'
+    displayName: 'Integration Test'
     inputs:
       mavenPomFile: 'pom.xml'
       mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
@@ -48,4 +36,6 @@ steps:
       sqMavenPluginVersionChoice: 'latest'
       codeCoverageToolOption: JaCoCo
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
-      goals: 'verify sonar:sonar -Drevision=$(VERSION)'
+      goals: 'verify -Drevision=$(VERSION)'
+      options: '-Drevision=$(VERSION) -P integration-test'
+

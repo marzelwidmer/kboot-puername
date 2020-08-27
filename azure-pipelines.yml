@@ -26,7 +26,7 @@ jobs:
     steps:
       - template: ci/templates/semver-steps.yaml
 
-  # Maven Build Test and Sonar
+  # Maven Build Test
   - job: Build
     dependsOn: SemVer
     displayName: "Build and Test Maven Artifact"
@@ -35,7 +35,11 @@ jobs:
     steps:
       - template: ci/templates/sonar-prepare-steps.yaml
       - template: ci/templates/maven-build-steps.yaml
+      - template: ci/templates/maven-integration-test-steps.yaml
+      - template: ci/templates/maven-sonar-steps.yaml.yaml
       - template: ci/templates/sonar-publish-steps.yaml
+
+
 
   # Maven Build Docker
   - job: BuildDockerImage

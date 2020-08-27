@@ -21,7 +21,8 @@ class PersonTest {
     @ParameterizedTest(name = "{index} test gender {0}")
     @ValueSource(chars = ['F', 'M'])
     fun `Person creation test - it must have a valid gender F 👧 or M 🧔`(input: Char) {
-        Person(firstName = FirstName("Kim"), gender = Gender(input)) }
+        Person(firstName = FirstName("Kim"), gender = Gender(input))
+    }
 
     @ParameterizedTest(name = "{index} negative test gender {0} have to be capital")
     @ValueSource(chars = ['f', 'm'])
