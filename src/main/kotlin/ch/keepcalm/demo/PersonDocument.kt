@@ -10,17 +10,6 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import java.util.*
 
-
-@Repository
-interface PersonRepository : ReactiveMongoRepository<PersonDocument, String>{
-//        fun findByFirstName(firstName: String) : Mono<PersonDocument>
-//        fun findByLastname(lastname: Mono<String?>?): Flux<Person?>?
-
-        fun findByFirstName(firstName: String): Flux<PersonDocument?>?
-
-
-}
-
 @Document
 data class PersonDocument(
         @Id
@@ -28,7 +17,7 @@ data class PersonDocument(
         val firstName: String) {
 
         companion object{
-                fun fromDomainObject(person: Person) = PersonDocument(firstName = person.firstName.toString())
+                fun fromDomainObject(person: Person) = PersonDocument(firstName = person.firstName.value)
         }
         fun toDomainObject() = Person(firstName = FirstName(this.firstName), gender = Gender('M'))
 }
