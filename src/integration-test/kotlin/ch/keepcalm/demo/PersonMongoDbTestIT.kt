@@ -1,7 +1,5 @@
-package ch.keepcalm.demo.`integration-test`
+package ch.keepcalm.demo
 
-import ch.keepcalm.demo.PersonDocument
-import ch.keepcalm.demo.PersonRepository
 import ch.keepcalm.demo.model.FirstName
 import ch.keepcalm.demo.model.Gender
 import ch.keepcalm.demo.model.Person
@@ -33,30 +31,26 @@ class PersonMongoDbTestIT @Autowired constructor(private val repository: PersonR
         }
     }
 
+
     @Test
-    fun `Persist PersonDocument object`() {
+    fun `Persist a Domain object as MongoDB object` () {
+        val personDocument= PersonDocument(firstName = "John")
+        val person = Person(firstName = FirstName("John"), gender = Gender('M'))
+
         StepVerifier.withVirtualTime {
-            repository.save(PersonDocument(firstName = "Bill"))
+            repository.save(PersonDocument(firstName = "John"))
         }.assertNext{
-            "Bill" shouldBeEqualTo it.firstName
+            it.firstName shouldBeEqualTo "John"
             it.id.shouldNotBeNull()
         }.verifyComplete()
     }
 
     @Test
-    fun `Persist a Domain Object as PersonDocument Object in MongoDB` () {
-        val kim = Person(firstName = FirstName("Kim"), gender = Gender('M'))
+    fun `Convert MongoDB Object to Domain object` () {
         StepVerifier.withVirtualTime {
-            repository.save(PersonDocument.fromDomainObject(kim))
+            repository.findByFirstName("John")
         }.assertNext{
-            it.firstName shouldBeEqualTo kim.firstName.toString()
+            it?.toDomainObject()?.firstName?.value shouldBeEqualTo "John"
         }.verifyComplete()
-    }
-
-    @Test
-    fun `count records` () {
-        val block = repository.count().block()
-        println(block)
-
     }
 }

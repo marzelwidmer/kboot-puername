@@ -1,7 +1,7 @@
 package ch.keepcalm.demo.model
 
 // Domain Primitive
-class Gender private constructor(private val value: Char) {
+data class Gender private constructor(val value: Char) {
     companion object {
         // Create Object
         operator fun invoke(value: Char) = Gender(validate(value = value))
