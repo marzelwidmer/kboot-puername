@@ -1,4 +1,24 @@
 steps:
+  # Sonar
+  - task: SonarCloudPrepare@1
+    displayName: 'Sonar prepare analysis configuration'
+    inputs:
+      SonarCloud: '$(SONAR_CLOUD)'
+      organization: '$(SONAR_ORGANIZATION)'
+      scannerMode: 'Other'
+      # Additional properties that will be passed to the scanner,
+      # Put one key=value per line, example:
+      # sonar.exclusions=**/*.bin
+      extraProperties: |
+        sonar.coverage.jacoco.xmlReportPaths=CCReport43F6D5EF/jacoco.xml
+        sonar.exclusions=src/main/test/**
+        sonar.exclusions=src/integration-test/**
+        
+        # Initial behavior of Maven task is that the SonarScanner uses information contained in Maven
+        # object model to provide smart defaults for most of the standard analysis parameters.
+        # You can however override this by setting wanted properties in this extraProperties space.
+        # Read more about this : https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-maven/#header-4
+
   # Download the artifacts
   - download: current
     artifact: variables
@@ -11,7 +31,7 @@ steps:
 
   # Maven Cache
   - task: Cache@2
-    displayName: Cache Maven local repo
+    displayName: 'Cache Maven local repo'
     inputs:
       key: 'maven | "$(Agent.OS)" | **/pom.xml'
       restoreKeys: |
@@ -21,19 +41,19 @@ steps:
 
   # Maven package -DskipTests
   - task: Maven@3
-    displayName: 'Execute Maven goal clean package'
+    displayName: 'Package'
     inputs:
       mavenPomFile: 'pom.xml'
       mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '$(JDK_VERSION)'
       jdkArchitectureOption: 'x64'
-      goals: 'clean package'
+      goals: 'package'
       options: '-Drevision=$(VERSION) -DskipTests'
 
-  # Maven verify
+  # Maven verify -P all-tests
   - task: Maven@3
-    displayName: 'Execute Maven goal verify'
+    displayName: 'All tests'
     inputs:
       mavenPomFile: 'pom.xml'
       mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
@@ -48,4 +68,25 @@ steps:
       sqMavenPluginVersionChoice: 'latest'
       codeCoverageToolOption: JaCoCo
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
-      goals: 'verify sonar:sonar -Drevision=$(VERSION)'
+      goals: 'verify'
+      options: '-Drevision=$(VERSION) -P all-tests'
+
+  # Maven sonar:sonar
+  - task: Maven@3
+    displayName: 'Sonar'
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '$(JDK_VERSION)'
+      jdkArchitectureOption: 'x64'
+      sonarQubeRunAnalysis: true
+      goals: 'sonar:sonar'
+      options: '-Drevision=$(VERSION) -P all-tests'
+
+  # Uncomment the next task to wait until SonarCloud processing has
+  # finished and to publish the result on the Pipeline build summary
+  - task: SonarCloudPublish@1
+    displayName: 'Sonar publish results on build summary'
+    inputs:
+      pollingTimeoutSec: '300'
