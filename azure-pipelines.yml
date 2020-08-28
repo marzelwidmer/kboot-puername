@@ -33,11 +33,7 @@ jobs:
     pool:
       vmImage: 'ubuntu-latest'
     steps:
-      - template: ci/templates/sonar-prepare-steps.yaml
       - template: ci/templates/maven-build-steps.yaml
-      - template: ci/templates/maven-integrations-test-steps.yaml
-      - template: ci/templates/maven-sonar-steps.yaml
-      - template: ci/templates/sonar-publish-steps.yaml
 
 
   # Maven Build Docker
