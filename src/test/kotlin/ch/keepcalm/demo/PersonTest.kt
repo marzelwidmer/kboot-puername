@@ -22,30 +22,44 @@ class PersonTest {
     }
 
     @ParameterizedTest(name = "{index} test gender {0}")
-    @ValueSource(chars = ['f','F', 'm','M'])
+    @ValueSource(chars = ['f', 'F', 'm', 'M'])
     fun `Person creation test - it must have a valid gender fF 👧 or mM 🧔`(input: Char) {
         Person(firstName = FirstName(Faker().name.firstName()), gender = Gender(input))
     }
 
-
     @Test
-    fun `test person firstName that is it not empty`() {
+    fun `test person firstName that is it not empty should throws IllegalStateException`() {
         Assertions.assertThrows(IllegalStateException::class.java) {
             Person(firstName = FirstName(""), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))
         }
     }
 
     @Test
-    fun `test person firstName have the correct length`() {
+    fun `test person firstName with 1 characters should throws IllegalStateException`() {
         Assertions.assertThrows(IllegalStateException::class.java) {
-            Person(firstName = FirstName("B"), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))
+            val name = "A"
+            Person(firstName = FirstName(name), gender = Gender('F'))
         }
     }
 
     @Test
-    fun `test person firstName very long name should throws IllegalStateException`() {
+    fun `test person firstName with minimum of 2 characters`() {
+        val name = "A".repeat(2)
+        Person(firstName = FirstName(name), gender = Gender('F'))
+    }
+
+    @Test
+    fun `test person firstName with 20 characters`() {
+        val name = "A".repeat(20)
+        Person(firstName = FirstName(name), gender = Gender('M'))
+    }
+
+    @Test
+    fun `test person firstName with 21 characters should throws IllegalStateException`() {
         Assertions.assertThrows(IllegalStateException::class.java) {
-            Person(firstName = FirstName(Faker().chuckNorris.fact()), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))
+            val name = "A".repeat(21)
+            Person(firstName = FirstName(name), gender = Gender('F'))
         }
     }
+
 }
