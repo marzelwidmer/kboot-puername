@@ -4,9 +4,9 @@ package ch.keepcalm.demo.model
 data class Gender private constructor(val value: Char) {
     companion object {
         // Create Object
-        operator fun invoke(value: Char) = Gender(validate(value = value))
+        operator fun invoke(value: Char) = Gender(validate(value = value.toLowerCase()))
         private fun validate(value: Char): Char {
-            check(value == 'M' || value == 'F') { "gender ist invalid (M|F)" }
+            check(value == 'm' || value == 'f') { "gender ist invalid (m|f)" }
             return value
         }
     }
