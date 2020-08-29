@@ -41,4 +41,11 @@ class PersonTest {
             Person(firstName = FirstName("B"), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))
         }
     }
+
+    @Test
+    fun `test person firstName very long name should throws IllegalStateException`() {
+        Assertions.assertThrows(IllegalStateException::class.java) {
+            Person(firstName = FirstName(Faker().chuckNorris.fact()), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))
+        }
+    }
 }
