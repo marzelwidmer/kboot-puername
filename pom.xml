@@ -38,6 +38,7 @@
         <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
         <skip.integration.tests>true</skip.integration.tests>
         <skip.unit.tests>false</skip.unit.tests>
+        <kotlin-faker.version>1.4.1</kotlin-faker.version>
     </properties>
 
     <dependencies>
@@ -98,12 +99,18 @@
             <scope>test</scope>
         </dependency>
 
-
         <!-- Hamcrest for Kotlin -->
         <dependency>
             <groupId>com.natpryce</groupId>
             <artifactId>hamkrest</artifactId>
             <version>${hamkrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.serpro69</groupId>
+            <artifactId>kotlin-faker</artifactId>
+            <version>${kotlin-faker.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -357,28 +364,14 @@
     </profiles>
 
 
+    <!-- Add jcenter as a repository for dependencies -->
     <repositories>
+        <!-- used for org.amshove.kluent -->
         <repository>
-            <id>spring-release</id>
-            <url>https://repo.spring.io/libs-release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com/</url>
         </repository>
-        <repository>
-            <id>spring-milestone</id>
-            <url>https://repo.spring.io/libs-milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>spring-snapshot</id>
-            <url>https://repo.spring.io/libs-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
+
     </repositories>
 
     <pluginRepositories>
