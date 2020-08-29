@@ -8,6 +8,7 @@ data class FirstName private constructor(val value: String) {
         private fun validate(value: String): String {
             check(value.isNotEmpty()) { "firstName must be non-empty" }
             check(value.trim().length >= 2) { "wrong firstName length" }
+            check(value.trim().length <= 20) { "wrong firstName length" }
             return value
         }
     }
