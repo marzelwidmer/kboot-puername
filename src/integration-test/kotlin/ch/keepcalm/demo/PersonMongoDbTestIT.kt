@@ -19,7 +19,7 @@ import reactor.test.StepVerifier
 
 @DataMongoTest
 @Testcontainers
-class PersonMongoDbTestIT @Autowired constructor(private val repository: PersonRepository) {
+class PersonMongoDbTestIT (@Autowired private val repository: PersonRepository) {
 
     companion object {
         val person = Person(firstName = FirstName(Faker().name.firstName()), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))

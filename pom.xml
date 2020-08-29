@@ -39,6 +39,7 @@
         <skip.integration.tests>true</skip.integration.tests>
         <skip.unit.tests>false</skip.unit.tests>
         <kotlin-faker.version>1.4.1</kotlin-faker.version>
+        <springmockk.version>2.0.3</springmockk.version>
     </properties>
 
     <dependencies>
@@ -107,12 +108,22 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Faker -->
         <dependency>
             <groupId>io.github.serpro69</groupId>
             <artifactId>kotlin-faker</artifactId>
             <version>${kotlin-faker.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- SpringMockK  -->
+        <dependency>
+            <groupId>com.ninja-squad</groupId>
+            <artifactId>springmockk</artifactId>
+            <version>${springmockk.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
