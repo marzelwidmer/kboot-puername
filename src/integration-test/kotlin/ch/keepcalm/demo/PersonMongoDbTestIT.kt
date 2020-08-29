@@ -3,6 +3,7 @@ package ch.keepcalm.demo
 import ch.keepcalm.demo.model.FirstName
 import ch.keepcalm.demo.model.Gender
 import ch.keepcalm.demo.model.Person
+import io.github.serpro69.kfaker.Faker
 import org.amshove.kluent.`should be equal to`
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeNull
@@ -21,8 +22,7 @@ import reactor.test.StepVerifier
 class PersonMongoDbTestIT @Autowired constructor(private val repository: PersonRepository) {
 
     companion object {
-        val person = Person(firstName = FirstName("John"), gender = Gender('M'))
-
+        val person = Person(firstName = FirstName(Faker().name.firstName()), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))
         @Container
         val container = MongoDBContainer("mongo:4.2.5").apply {
             this.start()
@@ -37,9 +37,10 @@ class PersonMongoDbTestIT @Autowired constructor(private val repository: PersonR
 
     @Test
     fun `Test should store and retrieve` () {
-        val personPublisher = repository.save(PersonDocument(firstName = "John"))
+        val fakeName = Faker().name.firstName()
+        val personPublisher = repository.save(PersonDocument(firstName = fakeName))
         StepVerifier.create(personPublisher).expectNextMatches {
-            it.firstName == "John"
+            it.firstName == fakeName
         }.verifyComplete()
     }
 
@@ -49,36 +50,40 @@ class PersonMongoDbTestIT @Autowired constructor(private val repository: PersonR
         StepVerifier.withVirtualTime {
             repository.save(PersonDocument.fromDomainObject(person))
         }.assertNext{
-            it.firstName shouldBeEqualTo "John"
+            it.firstName shouldBeEqualTo person.firstName.value
             it.id.shouldNotBeNull()
         }.verifyComplete()
     }
     @Test
     fun `Test Mapping from Mongo Document Object to Domain Object` () {
+        val fakeName = Faker().name.firstName()
         StepVerifier.withVirtualTime {
-            repository.save(PersonDocument(firstName = "John"))
+            repository.save(PersonDocument(firstName = fakeName))
         }.assertNext{
-            it?.toDomainObject()?.firstName?.value shouldBeEqualTo "John"
+            it?.toDomainObject()?.firstName?.value shouldBeEqualTo fakeName
         }.verifyComplete()
     }
 
     @Test
     fun `Search Person byFirstName and convert it to Domain object` () {
-        repository.save(PersonDocument(firstName = "Foo")).block()
+        val fakeName = Faker().name.firstName()
+
+        repository.save(PersonDocument(firstName = fakeName)).block()
         StepVerifier.withVirtualTime {
-            repository.findByFirstName("Foo")
+            repository.findByFirstName(fakeName)
         }.assertNext{
-            it?.toDomainObject()?.firstName?.value shouldBeEqualTo "Foo"
+            it?.toDomainObject()?.firstName?.value shouldBeEqualTo fakeName
         }.verifyComplete()
     }
 
     @Test
     fun `Test Repository should save and findByFirstName` () {
-        val sPerson = repository.save(PersonDocument(firstName = "Jack"))
-        val foundPersons = sPerson.thenMany(repository.findByFirstName("Jack"))
+        val fakeName = Faker().name.firstName()
+        val sPerson = repository.save(PersonDocument(firstName = fakeName))
+        val foundPersons = sPerson.thenMany(repository.findByFirstName(fakeName))
         StepVerifier.create(foundPersons)
             .expectNextMatches {
-                it.firstName == "Jack"
+                it.firstName == fakeName
             }.verifyComplete()
     }
 }
