@@ -10,41 +10,35 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-
 class PersonTest {
-
-
-    companion object {
-        val faker = Faker()
-    }
 
     @ParameterizedTest(name = "{index} negative test gender {0}")
     @ValueSource(chars = ['a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e', 'E', '1', 'g', 'G', 'h', 'H', 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', '2', 'n', 'N', 'o', 'O', 'p', 'P', 'q', 'Q', 'r', 'R',
         's', 'S', 't', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'])
     fun `Person negative creation test - only gender M od F is allowed `(input: Char) {
         Assertions.assertThrows(IllegalStateException::class.java) {
-            Person(firstName = FirstName(faker.name.firstName()), gender = Gender(input))
+            Person(firstName = FirstName(Faker().name.firstName()), gender = Gender(input))
         }
     }
 
     @ParameterizedTest(name = "{index} test gender {0}")
     @ValueSource(chars = ['f','F', 'm','M'])
     fun `Person creation test - it must have a valid gender fF 👧 or mM 🧔`(input: Char) {
-        Person(firstName = FirstName(faker.name.firstName()), gender = Gender(input))
+        Person(firstName = FirstName(Faker().name.firstName()), gender = Gender(input))
     }
 
 
     @Test
     fun `test person firstName that is it not empty`() {
         Assertions.assertThrows(IllegalStateException::class.java) {
-            Person(firstName = FirstName(""), gender = Gender(faker.gender.unique.shortBinaryTypes().single()))
+            Person(firstName = FirstName(""), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))
         }
     }
 
     @Test
     fun `test person firstName have the correct length`() {
         Assertions.assertThrows(IllegalStateException::class.java) {
-            Person(firstName = FirstName("B"), gender = Gender(faker.gender.unique.shortBinaryTypes().single()))
+            Person(firstName = FirstName("B"), gender = Gender(Faker().gender.unique.shortBinaryTypes().single()))
         }
     }
 }
