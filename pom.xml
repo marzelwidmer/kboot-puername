@@ -260,7 +260,6 @@
                 </executions>
             </plugin>
 
-
             <!-- surefire -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -268,10 +267,6 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <skipTests>${skip.unit.tests}</skipTests>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                        <argLine>-Xms1024 -Xmx2028m</argLine>
-                    </excludes>
                 </configuration>
             </plugin>
 
@@ -290,11 +285,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <includes>**/*IT.java</includes>
                     <skipTests>${skip.integration.tests}</skipTests>
                 </configuration>
             </plugin>
-
 
             <!-- jacoco -->
             <plugin>
@@ -326,8 +319,8 @@
                 <os>
                     <family>mac</family>
                 </os>
-            </activation>
             <!-- Build -->
+            </activation>
             <build>
                 <plugins>
                     <!-- Jib -->

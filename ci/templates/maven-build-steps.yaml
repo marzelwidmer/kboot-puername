@@ -53,7 +53,7 @@ steps:
 
   # Maven verify -P all-tests
   - task: Maven@3
-    displayName: 'All tests'
+    displayName: 'All Tests '
     inputs:
       mavenPomFile: 'pom.xml'
       mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
@@ -68,21 +68,10 @@ steps:
       sqMavenPluginVersionChoice: 'latest'
       codeCoverageToolOption: JaCoCo
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
-      goals: 'verify'
+      goals: 'verify sonar:sonar'
       options: '-Drevision=$(VERSION) -P all-tests'
 
-  # Maven sonar:sonar
-  - task: Maven@3
-    displayName: 'Sonar'
-    inputs:
-      mavenPomFile: 'pom.xml'
-      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
-      javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '$(JDK_VERSION)'
-      jdkArchitectureOption: 'x64'
-      sonarQubeRunAnalysis: true
-      goals: 'sonar:sonar'
-      options: '-Drevision=$(VERSION) -P all-tests'
+
 
   # Uncomment the next task to wait until SonarCloud processing has
   # finished and to publish the result on the Pipeline build summary
