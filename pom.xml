@@ -117,23 +117,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- SpringMockK  -->
-        <dependency>
-            <groupId>com.ninja-squad</groupId>
-            <artifactId>springmockk</artifactId>
-            <version>${springmockk.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- MockK  -->
-        <!--<dependency>
-            <groupId>io.mockk</groupId>
-            <artifactId>mockk</artifactId>
-            <version>${mockk.version}</version>
-            <scope>test</scope>
-        </dependency>-->
-
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

@@ -6,5 +6,8 @@ import org.springframework.stereotype.Component
 @Component
 class PersonHandler(val repository: PersonRepository) {
 
-    fun findAll() = repository.findAll()
+    fun listPersons() = repository.findAll()
+
 }
+
+
