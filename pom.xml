@@ -39,8 +39,6 @@
         <skip.integration.tests>true</skip.integration.tests>
         <skip.unit.tests>false</skip.unit.tests>
         <kotlin-faker.version>1.4.1</kotlin-faker.version>
-        <springmockk.version>2.0.3</springmockk.version>
-        <mockk.version>1.10.0</mockk.version>
     </properties>
 
     <dependencies>
@@ -259,6 +257,10 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <skipTests>${skip.unit.tests}</skipTests>
+                    <excludes>
+                        <exclude>**/*IT.java</exclude>
+                        <argLine>-Xms1024 -Xmx2028m</argLine>
+                    </excludes>
                 </configuration>
             </plugin>
 
@@ -277,6 +279,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <includes>**/*IT.java</includes>
                     <skipTests>${skip.integration.tests}</skipTests>
                 </configuration>
             </plugin>
@@ -311,8 +314,8 @@
                 <os>
                     <family>mac</family>
                 </os>
-            <!-- Build -->
             </activation>
+            <!-- Build -->
             <build>
                 <plugins>
                     <!-- Jib -->
