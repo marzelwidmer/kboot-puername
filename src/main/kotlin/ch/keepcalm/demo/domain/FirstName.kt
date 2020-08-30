@@ -1,4 +1,4 @@
-package ch.keepcalm.demo.model
+package ch.keepcalm.demo.domain
 
 // Domain Primitive
 data class FirstName private constructor(val value: String) {

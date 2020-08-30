@@ -1,4 +1,4 @@
-package ch.keepcalm.demo.person
+package ch.keepcalm.demo.person.repository
 
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository

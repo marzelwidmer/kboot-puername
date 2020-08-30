@@ -1,8 +1,8 @@
-package ch.keepcalm.demo.person
+package ch.keepcalm.demo.person.repository
 
-import ch.keepcalm.demo.model.FirstName
-import ch.keepcalm.demo.model.Gender
-import ch.keepcalm.demo.model.Person
+import ch.keepcalm.demo.domain.FirstName
+import ch.keepcalm.demo.domain.Gender
+import ch.keepcalm.demo.domain.Person
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
