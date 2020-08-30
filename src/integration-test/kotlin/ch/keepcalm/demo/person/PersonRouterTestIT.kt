@@ -32,4 +32,20 @@ class PersonRouterTestIT(@Autowired private val webTestClient: WebTestClient) {
             .expectStatus().isOk
             .expectBody().jsonPath("@.[0].firstName").isEqualTo("John")
     }
+
+    @Test
+    fun `Search Persons byName`() {
+        // Given
+        val john = Flux.just(PersonDocument(firstName = "John"))
+        // When
+        `when`(this.handler.findByFirstName("John"))
+            .thenReturn(john)
+        // Then
+        webTestClient.get()
+            .uri("/api/persons/search?name=John")
+            .exchange()
+            .expectHeader().contentType(MediaType.APPLICATION_JSON)
+            .expectStatus().isOk
+            .expectBody().jsonPath("@.[0].firstName").isEqualTo("John")
+    }
 }
