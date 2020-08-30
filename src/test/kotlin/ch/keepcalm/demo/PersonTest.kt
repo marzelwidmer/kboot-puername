@@ -1,10 +1,9 @@
 package ch.keepcalm.demo
 
-import ch.keepcalm.demo.model.FirstName
-import ch.keepcalm.demo.model.Gender
-import ch.keepcalm.demo.model.Person
+import ch.keepcalm.demo.domain.FirstName
+import ch.keepcalm.demo.domain.Gender
+import ch.keepcalm.demo.domain.Person
 import io.github.serpro69.kfaker.Faker
-import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
