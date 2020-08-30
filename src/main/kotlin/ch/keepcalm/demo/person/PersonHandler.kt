@@ -1,6 +1,5 @@
-package ch.keepcalm.demo.person.handler
+package ch.keepcalm.demo.person
 
-import ch.keepcalm.demo.person.repository.PersonRepository
 import org.springframework.stereotype.Component
 
 @Component

@@ -1,4 +1,4 @@
-package ch.keepcalm.demo.person.repository
+package ch.keepcalm.demo.person
 
 import ch.keepcalm.demo.domain.FirstName
 import ch.keepcalm.demo.domain.Gender

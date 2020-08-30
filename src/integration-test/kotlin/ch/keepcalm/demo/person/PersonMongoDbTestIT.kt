@@ -1,10 +1,8 @@
-package ch.keepcalm.demo
+package ch.keepcalm.demo.person
 
 import ch.keepcalm.demo.domain.FirstName
 import ch.keepcalm.demo.domain.Gender
 import ch.keepcalm.demo.domain.Person
-import ch.keepcalm.demo.person.repository.PersonDocument
-import ch.keepcalm.demo.person.repository.PersonRepository
 import io.github.serpro69.kfaker.Faker
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeNull

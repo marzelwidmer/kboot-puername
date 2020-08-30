@@ -1,8 +1,5 @@
-package ch.keepcalm.demo
+package ch.keepcalm.demo.person
 
-import ch.keepcalm.demo.person.handler.PersonHandler
-import ch.keepcalm.demo.person.repository.PersonDocument
-import ch.keepcalm.demo.person.routes.PersonRouter
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired

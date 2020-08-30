@@ -1,6 +1,6 @@
-package ch.keepcalm.demo.person.routes
+package ch.keepcalm.demo.person
 
-import ch.keepcalm.demo.person.handler.PersonHandler
+import ch.keepcalm.demo.person.PersonHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType

@@ -1,6 +1,5 @@
-package ch.keepcalm.demo
+package ch.keepcalm.demo.person
 
-import ch.keepcalm.demo.person.repository.PersonDocument
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
