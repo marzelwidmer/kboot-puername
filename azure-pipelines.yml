@@ -15,7 +15,7 @@ variables:
 
   K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
   K8S_DIR: 'k8s'
-  DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
+  DOCKER_REGISTRY: 'docker-registry.default.svc:5000/dev'
 
 jobs:
   # Semantic Version
