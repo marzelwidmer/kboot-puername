@@ -9,11 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ch.keepcalm</groupId>
-    <artifactId>kboot-bname</artifactId>
+    <artifactId>kboot-puername</artifactId>
 
     <version>${revision}</version>
 
-    <name>bname</name>
+    <name>puername</name>
     <description>Kotlin Spring Boot</description>
 
     <properties>

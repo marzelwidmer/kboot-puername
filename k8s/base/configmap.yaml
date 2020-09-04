@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  template:
+    spec:
+      containers:
+        # TODO FIXME
+        - name: puername-service
+          volumeMounts:
+            - mountPath: /config
+              name: env-config
+      volumes:
+        - name: env-config
+          configMap:
+            name: env-config
+
+
+
+
+
+

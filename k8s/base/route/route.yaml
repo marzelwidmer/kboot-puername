@@ -3,7 +3,7 @@ kind: Route
 metadata:
   name: app
 spec:
-  host: bname-app-dev.apps.c3smonkey.ch
+  host: $(routeName)-$(routeNamespace).osp-appl-preprod.hel.kko.ch
   port:
     targetPort: 8080-8080
   tls:
@@ -16,6 +16,7 @@ spec:
 status:
   ingress:
     - conditions:
-      host: bname-app-dev.apps.c3smonkey.ch
+      host: $(routeName)-$(routeNamespace).osp-appl-preprod.hel.kko.ch
       routerName: router
       wildcardPolicy: None
+

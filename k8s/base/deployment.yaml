@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app
+  name: app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - image: c3smonkey/template
+          # TODO Change name
+          name: puername-service
+          ports:
+            - containerPort: 8080
+              name: 8080-tcp
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+
