@@ -47,7 +47,7 @@ jobs:
 
   # Maven Build Docker
   - job: BuildKustomize
-    dependsOn: SemVer
+    dependsOn: Build
     displayName: 'Kustomize Build'
     pool:
       vmImage: 'ubuntu-latest'
