@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ch.keepcalm</groupId>
-    <artifactId>puername</artifactId>
+    <artifactId>kboot-bname</artifactId>
 
     <version>${revision}</version>
 
