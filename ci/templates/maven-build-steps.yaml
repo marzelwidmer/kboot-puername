@@ -52,24 +52,24 @@ steps:
       options: '-Drevision=$(VERSION) -DskipTests'
 
   # Maven verify -P all-tests
-#  - task: Maven@3
-#    displayName: 'All tests'
-#    inputs:
-#      mavenPomFile: 'pom.xml'
-#      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
-#      mavenVersionOption: 'Default'
-#      javaHomeOption: 'JDKVersion'
-#      jdkVersionOption: '$(JDK_VERSION)'
-#      jdkArchitectureOption: 'x64'
-#      publishJUnitResults: true
-#      mavenAuthenticateFeed: false
-#      effectivePomSkip: false
-#      sonarQubeRunAnalysis: true
-#      sqMavenPluginVersionChoice: 'latest'
-#      codeCoverageToolOption: JaCoCo
-#      testResultsFiles: '**/surefire-reports/TEST-*.xml'
-#      goals: 'verify'
-#      options: '-Drevision=$(VERSION) -P all-tests'
+  - task: Maven@3
+    displayName: 'All tests'
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+      mavenVersionOption: 'Default'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '$(JDK_VERSION)'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: true
+      sqMavenPluginVersionChoice: 'latest'
+      codeCoverageToolOption: JaCoCo
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      goals: 'verify'
+      options: '-Drevision=$(VERSION) -P all-tests'
 
   # Maven sonar:sonar
   - task: Maven@3
