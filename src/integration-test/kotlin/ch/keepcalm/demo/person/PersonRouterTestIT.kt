@@ -19,11 +19,9 @@ class PersonRouterTestIT(@Autowired private val webTestClient: WebTestClient) {
 
     @Test
     fun `Give back Persons from the Web Tier with Mockito`() {
-        // Given
-        val john = Flux.just(PersonDocument(firstName = "John"))
         // When
         `when`(this.handler.listPersons())
-            .thenReturn(john)
+            .thenReturn(Flux.just(PersonDocument(firstName = "John")))
         // Then
         webTestClient.get()
             .uri("/api/persons")
@@ -35,11 +33,9 @@ class PersonRouterTestIT(@Autowired private val webTestClient: WebTestClient) {
 
     @Test
     fun `Search Persons byName`() {
-        // Given
-        val john = Flux.just(PersonDocument(firstName = "John"))
         // When
         `when`(this.handler.findByFirstName("John"))
-            .thenReturn(john)
+            .thenReturn(Flux.just(PersonDocument(firstName = "John")))
         // Then
         webTestClient.get()
             .uri("/api/persons/search?name=John")

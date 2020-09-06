@@ -1,5 +1,4 @@
 import org.springframework.cloud.contract.spec.ContractDsl.Companion.contract
-import org.springframework.http.MediaType
 
 contract {
     description = "/api/persons should return a JSON collection of Persons"

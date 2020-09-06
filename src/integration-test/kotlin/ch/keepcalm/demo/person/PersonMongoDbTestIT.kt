@@ -33,7 +33,6 @@ class PersonMongoDbTestIT (@Autowired private val repository: PersonRepository) 
         }
     }
 
-
     @Test
     fun `Test should store and retrieve` () {
         val fakeName = Faker().name.firstName()
@@ -42,7 +41,6 @@ class PersonMongoDbTestIT (@Autowired private val repository: PersonRepository) 
             it.firstName == fakeName
         }.verifyComplete()
     }
-
 
     @Test
     fun `Test Mapping Domain Object to Mongo Document Object` () {
@@ -53,6 +51,7 @@ class PersonMongoDbTestIT (@Autowired private val repository: PersonRepository) 
             it.id.shouldNotBeNull()
         }.verifyComplete()
     }
+
     @Test
     fun `Test Mapping from Mongo Document Object to Domain Object` () {
         val fakeName = Faker().name.firstName()

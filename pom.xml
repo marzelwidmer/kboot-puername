@@ -43,10 +43,13 @@
         <skip.unit.tests>false</skip.unit.tests>
         <kotlin-faker.version>1.4.1</kotlin-faker.version>
 
+        <mockito-kotlin.version>2.2.0</mockito-kotlin.version>
+
         <!-- Spring Cloud Contracts -->
         <spring-cloud-contract.version>2.2.4.RELEASE</spring-cloud-contract.version>
-    </properties>
+        <rest-assured.version>4.0.0</rest-assured.version>
 
+    </properties>
 
 
     <dependencyManagement>
@@ -159,7 +162,6 @@
             <artifactId>sonar-maven-plugin</artifactId>
             <version>${sonar-maven-plugin.version}</version>
         </dependency>
-
         <!-- https://repo.spring.io/libs-release -->
         <!-- https://markusamshove.github.io/Kluent/ -->
         <dependency>
@@ -170,205 +172,34 @@
         </dependency>
 
 
-
-
-
-
+        <!-- Contracts -->
         <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-contract-verifier</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Remember to add this for the DSL support in the IDE and on the consumer side -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--  Used For SpringContracts WEBTESTCLIENT testMode  -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>spring-web-test-client</artifactId>
+            <version>${rest-assured.version}</version>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
+
 
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
-
-
-            <!-- Contracts -->
-            <plugin>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-contract-maven-plugin</artifactId>
-                <version>${spring-cloud-contract.version}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <testFramework>JUNIT5</testFramework>
-                    <testMode>EXPLICIT</testMode>
-<!--                    <basePackageForTests>-->
-<!--                        ch.keepcalm.demo.contract-->
-<!--                    </basePackageForTests>-->
-                    <baseClassForTests>
-                        ch.keepcalm.demo.contract.BaseTestClass
-                    </baseClassForTests>
-                    <failOnInProgress>false</failOnInProgress>
-                </configuration>
-                <dependencies>
-                    <!-- Contract Spec Kotlin -->
-                    <dependency>
-                        <groupId>org.springframework.cloud</groupId>
-                        <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
-                        <version>${spring-cloud-contract.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-
-           <!-- <plugin>
-                &lt;!&ndash; Contracts &ndash;&gt;
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-contract-maven-plugin</artifactId>
-                <version>${spring-cloud-contract.version}</version>
-                <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>convert</goal>
-                            <goal>generateStubs</goal>
-                            <goal>generateTests</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <testFramework>JUNIT5</testFramework>
-                    <baseClassForTests>ch.keepcalm.demo.contract.base.BaseTestClass</baseClassForTests>
-                    <testMode>EXPLICIT</testMode>
-                    &lt;!&ndash;                            <testMode>WEBTESTCLIENT</testMode>&ndash;&gt;
-                </configuration>
-                <dependencies>
-                    &lt;!&ndash; Contract Spec Kotlin &ndash;&gt;
-                    <dependency>
-                        <groupId>org.springframework.cloud</groupId>
-                        <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
-                        <version>${spring-cloud-contract.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            &lt;!&ndash; Build Helper &ndash;&gt;
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-test-sources/contracts/</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>-->
-            <!-- Maven Compiler used because of Kotlin -->
-        <!--    <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <executions>
-                    &lt;!&ndash; Replacing default-compile as it is treated specially by maven &ndash;&gt;
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    &lt;!&ndash; Replacing default-testCompile as it is treated specially by maven &ndash;&gt;
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>java-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>${maven-deploy-plugin.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>${maven-clean-plugin.version}</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>build</directory>
-                        </fileset>
-                        <fileset>
-                            <directory>target</directory>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>-->
-
-
-
-
-
-
-
-            <!-- Maven Compile -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <executions>
-                    <!-- Replacing default-compile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <!-- Replacing default-testCompile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>java-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-
-
-
-
-
-
-
-
-
-
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -414,7 +245,6 @@
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
                                 <sourceDir>${project.basedir}/src/integration-test/kotlin</sourceDir>
-<!--                                <sourceDir>target/generated-test-sources/contracts</sourceDir>-->
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -428,6 +258,95 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+
+
+
+
+            <!-- Contracts -->
+            <plugin>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-contract-maven-plugin</artifactId>
+                <version>${spring-cloud-contract.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <testFramework>JUNIT5</testFramework>
+                    <testMode>WEBTESTCLIENT</testMode>
+                    <baseClassForTests>
+                        ch.keepcalm.demo.contract.PersonRestBase
+                    </baseClassForTests>
+                    <failOnInProgress>false</failOnInProgress>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>convert</goal>
+                            <goal>generateStubs</goal>
+                            <goal>generateTests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <!-- Contract Spec Kotlin -->
+                    <dependency>
+                        <groupId>org.springframework.cloud</groupId>
+                        <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
+                        <version>${spring-cloud-contract.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <!-- Maven Compile -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <executions>
+                    <!-- Replacing default-compile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <!-- Replacing default-testCompile as it is treated specially by maven -->
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>java-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>java-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-test-sources/contracts/</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
 
 
             <!-- integration-test -->
@@ -445,7 +364,6 @@
                         <configuration>
                             <sources>
                                 <source>src/integration-test/kotlin</source>
-<!--                                <source>${project.build.directory}/generated-test-sources/contracts/</source>-->
                             </sources>
                         </configuration>
                     </execution>
