@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
+  GIT_VERSION_CONFIGURATION: '../ci/GitVersion.yml'
   JDK_VERSION: '1.11'
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
   MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
@@ -24,13 +24,9 @@ stages:
   # SemVer
   - stage: StageVersion
     displayName: 'Semantic Version'
-    variables:
-      GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
     jobs:
       - job: SemVer
         displayName: "Semantic Version - Semantic Release"
-        variables:
-          GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
