@@ -51,7 +51,6 @@ stages:
     dependsOn: StageVersion
     jobs:
       - job: Build
-        dependsOn: SemVer
         displayName: "Build and Test Maven Artifact"
         pool:
           vmImage: 'ubuntu-latest'
@@ -61,10 +60,9 @@ stages:
   # Dockerize
   - stage: StageDockerBuild
     displayName: 'Build Docker Image'
-    dependsOn: StageTest
+    dependsOn: StageBuild
     jobs:
       - job: BuildDockerImage
-        dependsOn: Build
         displayName: 'Build Docker Image'
         pool:
           vmImage: 'ubuntu-latest'
@@ -78,7 +76,6 @@ stages:
     dependsOn: StageDockerBuild
     jobs:
       - job: TagGitRepo
-        dependsOn: Build
         displayName: 'Create Tag on Git Repository'
         condition: and(contains(variables['build.sourceBranch'], 'refs/heads/master'), succeeded())
         pool:
