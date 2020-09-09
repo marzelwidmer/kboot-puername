@@ -20,13 +20,13 @@ import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Flux
 
 @ExtendWith(RestDocumentationExtension::class, SpringExtension::class)
-@AutoConfigureRestDocs(outputDir = "target/generated-snippets")
+@AutoConfigureRestDocs
 abstract class PersonRestBase {
 
     @BeforeEach
     fun setup(restDocumentation: RestDocumentationContextProvider?, testInfo: TestInfo) {
         RestAssuredWebTestClient
-            .webTestClient(webTestClient(restDocumentation))
+            .webTestClient(webTestClient2(restDocumentation))
     }
 
 
@@ -60,5 +60,4 @@ abstract class PersonRestBase {
             }
         }
     }
-
 }

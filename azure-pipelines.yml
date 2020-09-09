@@ -1,8 +1,11 @@
 trigger:
   - /**
 
+pool:
+  vmImage: 'ubuntu-latest'
+
 variables:
-  GIT_VERSION_CONFIGURATION: './ci/GitVersion.yaml'
+  GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
   JDK_VERSION: '1.11'
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
   MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
@@ -15,52 +18,73 @@ variables:
 
   K8S_DEFAULT_IMAGE: 'c3smonkey/template:latest'
   K8S_DIR: 'k8s'
-  DOCKER_REGISTRY: 'docker-registry.default.svc:5000/dev'
+  DOCKER_REGISTRY: 'docker-registry.default.svc:5000'
 
-jobs:
-  # Semantic Version
-  - job: SemVer
-    displayName: "Semantic Version - Semantic Release"
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      - template: ci/templates/semver-steps.yaml
+stages:
+  # SemVer
+  - stage: StageVersion
+    displayName: 'Semantic Version'
+    variables:
+      GIT_VERSION_CONFIGURATION: './ci/GitVersion.yml'
+    jobs:
+      - job: SemVer
+        displayName: "Semantic Version - Semantic Release"
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - template: ci/templates/semver-steps.yaml
 
-  # Maven Build Test
-  - job: Build
-    dependsOn: SemVer
-    displayName: "Build and Test Maven Artifact"
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      - template: ci/templates/maven-build-steps.yaml
+  # Kustomize
+  - stage: StageKustomize
+    displayName: 'Kustomize'
+    jobs:
+      - job: BuildKustomize
+        displayName: 'Kustomize Build'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - template: ci/templates/kustomize-build-steps.yaml
 
+  # Build
+  - stage: StageBuild
+    displayName: 'Build Artifact'
+    dependsOn: StageVersion
+    jobs:
+      - job: Build
+        dependsOn: SemVer
+        displayName: "Build and Test Maven Artifact"
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - template: ci/templates/maven-build-steps.yaml
 
-  # Maven Build Docker
-  - job: BuildDockerImage
-    dependsOn: Build
+  # Dockerize
+  - stage: StageDockerBuild
     displayName: 'Build Docker Image'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      - template: ci/templates/maven-docker-build-steps.yaml
+    dependsOn: StageTest
+    jobs:
+      - job: BuildDockerImage
+        dependsOn: Build
+        displayName: 'Build Docker Image'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - template: ci/templates/maven-docker-build-steps.yaml
 
-  # Maven Build Docker
-  - job: BuildKustomize
-    dependsOn: Build
-    displayName: 'Kustomize Build'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      - template: ci/templates/kustomize-build-steps.yaml
-
-  # Tag Git Repo
-  - job: TagGitRepo
-    dependsOn: Build
+  # Tag only on master
+  - stage: StageTag
     displayName: 'Create Tag on Git Repository'
     condition: and(contains(variables['build.sourceBranch'], 'refs/heads/master'), succeeded())
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      - template: ci/templates/git-tag-repository-steps.yaml
+    dependsOn: StageDockerBuild
+    jobs:
+      - job: TagGitRepo
+        dependsOn: Build
+        displayName: 'Create Tag on Git Repository'
+        condition: and(contains(variables['build.sourceBranch'], 'refs/heads/master'), succeeded())
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - template: ci/templates/git-tag-repository-steps.yaml
+
+
 

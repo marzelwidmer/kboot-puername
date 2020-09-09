@@ -1,0 +1,23 @@
+{project-name} tries to adhere as closely as possible to standard HTTP and REST conventions in its.
+The HAL Rel. names is based on C(reat)R(ead)U(pdate)D(elete) namings. If there more then one in the same resource like in a collection.
+It will be specified like : `update-address`.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PATCH`
+| Used to update an existing resource, including partial updates
+
+| `PUT`
+| Used to update an existing resource, full updates only
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
