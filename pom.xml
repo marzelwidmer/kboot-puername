@@ -299,6 +299,7 @@
                 <configuration>
                     <testFramework>JUNIT5</testFramework>
                     <testMode>WEBTESTCLIENT</testMode>
+<!--                    <testMode>EXPLICIT</testMode>-->
                     <baseClassForTests>
                         ch.keepcalm.demo.contract.PersonRestBase
                     </baseClassForTests>
