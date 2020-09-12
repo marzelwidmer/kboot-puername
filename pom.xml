@@ -17,6 +17,7 @@
     <description>Kotlin Spring Boot</description>
 
     <properties>
+        <spring-boot-maven-plugin.version>2.3.3.RELEASE</spring-boot-maven-plugin.version>
         <java.version>11</java.version>
         <revision>0.0.0</revision>
         <kotlin.version>1.4.0</kotlin.version>
@@ -27,10 +28,14 @@
 
         <!-- Jib -->
         <jib.maven-plugin-version>2.5.2</jib.maven-plugin-version>
-        <jib.from.image>gcr.io/distroless/java@sha256:7fc091e8686df11f7bf0b7f67fd7da9862b2b9a3e49978d1184f0ff62cb673cc
-        </jib.from.image>
+        <jib.from.image>gcr.io/distroless/java:11</jib.from.image>
 
         <!--	TEST	-->
+        <!-- Spring Cloud Contracts -->
+        <spring-cloud-contract.version>2.2.4.BUILD-SNAPSHOT</spring-cloud-contract.version>
+        <rest-assured.version>4.0.0</rest-assured.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
@@ -45,23 +50,19 @@
 
         <mockito-kotlin.version>2.2.0</mockito-kotlin.version>
 
-        <!-- Spring Cloud Contracts -->
-        <spring-cloud-contract.version>2.2.4.RELEASE</spring-cloud-contract.version>
-        <rest-assured.version>4.0.0</rest-assured.version>
-
-
         <!-- =================  Documentation ================= -->
         <!-- Asciidoc -->
         <spring-restdocs-asciidoctor.version>2.0.4.RELEASE</spring-restdocs-asciidoctor.version>
         <asciidoctor.maven.plugin.version>1.5.7.1</asciidoctor.maven.plugin.version>
         <asciidoctorj-diagram.version>1.5.12</asciidoctorj-diagram.version>
         <asciidoctorj.version>1.5.8.1</asciidoctorj.version>
+        <!-- Asciidoc Configuration -->
         <asciidoctor-maven-plugin.sourceDirectory>src/docs/asciidoc</asciidoctor-maven-plugin.sourceDirectory>
         <asciidoctor-maven-plugin.baseDir>src/docs/resources</asciidoctor-maven-plugin.baseDir>
-        <asciidoctor-maven-plugin.snippetsDirectory>${project.build.directory}/generated-snippets</asciidoctor-maven-plugin.snippetsDirectory>
-        <asciidoctor-maven-plugin.outputDirectory>${project.build.directory}/classes/static/api-docs</asciidoctor-maven-plugin.outputDirectory>
-
-
+        <asciidoctor-maven-plugin.snippetsDirectory>${project.build.directory}/generated-snippets
+        </asciidoctor-maven-plugin.snippetsDirectory>
+        <asciidoctor-maven-plugin.outputDirectory>${project.build.directory}/classes/static/api-docs
+        </asciidoctor-maven-plugin.outputDirectory>
     </properties>
 
 
@@ -225,9 +226,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
+                            <goal>repackage</goal>
                             <goal>build-info</goal>
                         </goals>
                     </execution>
@@ -242,6 +245,7 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
                 <configuration>
                     <args>
                         <arg>-Xjsr305=strict</arg>
@@ -282,14 +286,6 @@
             </plugin>
 
 
-
-
-
-
-
-
-
-
             <!-- Contracts -->
             <plugin>
                 <groupId>org.springframework.cloud</groupId>
@@ -299,7 +295,7 @@
                 <configuration>
                     <testFramework>JUNIT5</testFramework>
                     <testMode>WEBTESTCLIENT</testMode>
-<!--                    <testMode>EXPLICIT</testMode>-->
+                    <!--                    <testMode>EXPLICIT</testMode>-->
                     <baseClassForTests>
                         ch.keepcalm.demo.contract.PersonRestBase
                     </baseClassForTests>
@@ -354,6 +350,7 @@
                         </goals>
                     </execution>
                 </executions>
+
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -373,16 +370,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-
-
-
-
-
-
-
-
-
 
 
             <!-- AsciiDoc -->
@@ -440,15 +427,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-
-
-
-
-
-
-
-
 
 
             <!-- integration-test -->
