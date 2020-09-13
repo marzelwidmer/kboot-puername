@@ -82,7 +82,7 @@ steps:
       jdkArchitectureOption: 'x64'
       sonarQubeRunAnalysis: true
       goals: 'sonar:sonar'
-      options: '-Drevision=$(VERSION) -P all-tests'
+      options: '-Drevision=$(VERSION)'
 
   # Uncomment the next task to wait until SonarCloud processing has
   # finished and to publish the result on the Pipeline build summary
