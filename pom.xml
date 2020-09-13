@@ -25,9 +25,6 @@
         <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
 
         <!-- TEST -->
-        <skip.integration.tests>true</skip.integration.tests>
-        <skip.unit.tests>false</skip.unit.tests>
-
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
@@ -241,16 +238,17 @@
                 </dependencies>
             </plugin>
 
+
             <!-- surefire -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <skipTests>${skip.unit.tests}</skipTests>
+                    <includes>
+                        <include>**/*Test.**</include>
+                    </includes>
                     <excludes>
-                        <exclude>**/*IT.java</exclude>
-                        <argLine>-Xms1024 -Xmx2028m</argLine>
+                        <exclude>**/*IntegrationTest.**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -284,13 +282,6 @@
         <!-- =================  Integration Tests ================= -->
         <profile>
             <id>integration-tests</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>true</skip.unit.tests>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -353,24 +344,17 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <!-- failsafe -->
+                    <!-- surefire -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <version>${maven-failsafe-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>integration-tests</id>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
+                        <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <includes>**/*IT.java</includes>
-                            <skipTests>${skip.integration.tests}</skipTests>
+                            <includes>
+                                <include>**/*IntegrationTest.**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*StagingIntegrationTest.**</exclude>
+                            </excludes>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -378,12 +362,32 @@
         </profile>
 
 
+
+
+
+        <!-- =================  Integration Tests ================= -->
+        <!--<profile>
+            <id>surefire</id>
+            <build>
+                <plugins>
+                    &lt;!&ndash; surefire &ndash;&gt;
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*IntegrationTest.**</include>
+                                <include>**/*Test.**</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>-->
+
         <!-- =================  Contracts ================= -->
         <profile>
-            <id>contracts</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>tests-with-contracts</id>
             <dependencies>
                 <!-- Contracts -->
                 <dependency>
@@ -412,6 +416,18 @@
             </dependencies>
             <build>
                 <plugins>
+
+                    <!-- surefire -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*Test.**</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+
                     <plugin>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-plugin</artifactId>
@@ -544,9 +560,6 @@
         <!-- =================  Documentation ================= -->
         <profile>
             <id>asciidoc</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <!-- Asciidoc Configuration -->
                 <asciidoctor-maven-plugin.sourceDirectory>src/asciidoc/docs/</asciidoctor-maven-plugin.sourceDirectory>
@@ -620,9 +633,6 @@
         <!-- =================  JIB ================= -->
         <profile>
             <id>jib</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <jib.from.image>gcr.io/distroless/java:11</jib.from.image>
             </properties>
@@ -662,7 +672,6 @@
             <id>jcenter</id>
             <url>https://jcenter.bintray.com/</url>
         </repository>
-
     </repositories>
 
     <pluginRepositories>

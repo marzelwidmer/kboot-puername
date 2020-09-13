@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux
 
 @WebFluxTest
 @Import(value = [PersonRouter::class])
-class PersonRouterTestIT(@Autowired private val webTestClient: WebTestClient) {
+class PersonRouterIntegrationTest(@Autowired private val webTestClient: WebTestClient) {
 
     @MockBean
     private lateinit var handler: PersonHandler
