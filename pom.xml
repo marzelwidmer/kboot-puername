@@ -31,7 +31,7 @@
 
         <!--	TEST	-->
         <!-- Spring Cloud Contracts -->
-        <spring-cloud-contract.version>2.2.4.BUILD-SNAPSHOT</spring-cloud-contract.version>
+        <spring-cloud-contract.version>2.2.4.RELEASE</spring-cloud-contract.version>
         <rest-assured.version>4.0.0</rest-assured.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 
