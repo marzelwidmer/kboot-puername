@@ -25,6 +25,9 @@
         <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
 
         <!-- TEST -->
+        <skip.integration.tests>true</skip.integration.tests>
+        <skip.unit.tests>false</skip.unit.tests>
+
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
@@ -32,9 +35,6 @@
         <hamkrest.version>1.7.0.3</hamkrest.version>
         <kluent.version>1.61</kluent.version>
         <testcontainers.version>1.14.3</testcontainers.version>
-
-        <skip.integration.tests>true</skip.integration.tests>
-        <skip.unit.tests>false</skip.unit.tests>
         <kotlin-faker.version>1.4.1</kotlin-faker.version>
         <mockito-kotlin.version>2.2.0</mockito-kotlin.version>
     </properties>
@@ -93,7 +93,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
         </dependency>
-
 
         <!-- TEST -->
         <dependency>
@@ -168,8 +167,6 @@
 
 
     <build>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -189,84 +186,59 @@
                 </configuration>
             </plugin>
 
+            <!-- Kotlin -->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <configuration>
-                    <args>
-                        <arg>-Xjsr305=strict</arg>
-                    </args>
-                    <compilerPlugins>
-                        <plugin>spring</plugin>
-                    </compilerPlugins>
-                </configuration>
-                <!-- Integration Test Kotlin Test Compile-->
                 <executions>
                     <execution>
                         <id>compile</id>
+                        <phase>compile</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/main/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>test-compile</id>
+                        <phase>test-compile</phase>
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                                <sourceDir>${project.basedir}/src/integration-test/kotlin</sourceDir>
-                                <sourceDir>${project.basedir}/src/contracts-test/kotlin</sourceDir>
+                                <source>src/test/kotlin</source>
                             </sourceDirs>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <args>
+                        <arg>-Xjsr305=warn</arg>
+                        <arg>-Xjsr305=@javax.annotation.Nullable:ignore</arg>
+                    </args>
+                    <compilerPlugins>
+                        <plugin>spring</plugin>
+                        <plugin>jpa</plugin>
+                    </compilerPlugins>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-allopen</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
+                    <!-- Used for JPA -->
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
                 </dependencies>
-            </plugin>
-
-            <!-- integration-test -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>${build-helper-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>add-integration-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/integration-test/kotlin</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <!-- Add a new resource directory to our build -->
-                    <execution>
-                        <id>add-integration-test-resources</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>add-test-resource</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <filtering>true</filtering>
-                                    <directory>src/integration-test/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- surefire -->
@@ -280,26 +252,6 @@
                         <exclude>**/*IT.java</exclude>
                         <argLine>-Xms1024 -Xmx2028m</argLine>
                     </excludes>
-                </configuration>
-            </plugin>
-
-            <!-- failsafe -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-failsafe-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>integration-tests</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>**/*IT.java</includes>
-                    <skipTests>${skip.integration.tests}</skipTests>
                 </configuration>
             </plugin>
 
@@ -326,27 +278,105 @@
         </plugins>
     </build>
 
-    <!-- Profiles -->
+
+    <!-- =================  Profiles ================= -->
     <profiles>
-        <!-- Integration Tests  -->
+        <!-- =================  Integration Tests ================= -->
         <profile>
             <id>integration-tests</id>
-            <properties>
-                <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>true</skip.unit.tests>
-            </properties>
-        </profile>
-        <!-- All Tests  -->
-        <profile>
-            <id>all-tests</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>false</skip.unit.tests>
+                <skip.unit.tests>true</skip.unit.tests>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-plugin</artifactId>
+                        <version>${kotlin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>compile</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>test-compile</id>
+                                <goals>
+                                    <goal>test-compile</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDirs>
+                                        <sourceDir>${project.basedir}/src/integration-test/kotlin</sourceDir>
+                                    </sourceDirs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- integration-test  -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>${build-helper-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>add-integration-test-sources</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/integration-test/kotlin</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <!-- Add a new resource directory to our build -->
+                            <execution>
+                                <id>add-integration-test-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>add-test-resource</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <filtering>true</filtering>
+                                            <directory>src/integration-test/resources</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- failsafe -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>${maven-failsafe-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>integration-tests</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <includes>**/*IT.java</includes>
+                            <skipTests>${skip.integration.tests}</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
+
 
         <!-- =================  Contracts ================= -->
         <profile>
@@ -354,8 +384,6 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-
-
             <dependencies>
                 <!-- Contracts -->
                 <dependency>
@@ -382,9 +410,32 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
-
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-plugin</artifactId>
+                        <version>${kotlin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>compile</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>test-compile</id>
+                                <goals>
+                                    <goal>test-compile</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDirs>
+                                        <sourceDir>${project.basedir}/src/contracts-test/kotlin</sourceDir>
+                                    </sourceDirs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.springframework.cloud</groupId>
                         <artifactId>spring-cloud-contract-maven-plugin</artifactId>
@@ -449,7 +500,7 @@
                             </execution>
                         </executions>
                     </plugin>
-
+                    <!-- Add generated contracts test sources -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
@@ -496,17 +547,15 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-
             <properties>
                 <!-- Asciidoc Configuration -->
-                <asciidoctor-maven-plugin.sourceDirectory>src/docs/asciidoc</asciidoctor-maven-plugin.sourceDirectory>
-                <asciidoctor-maven-plugin.baseDir>src/docs/resources</asciidoctor-maven-plugin.baseDir>
+                <asciidoctor-maven-plugin.sourceDirectory>src/asciidoc/docs/</asciidoctor-maven-plugin.sourceDirectory>
+                <asciidoctor-maven-plugin.baseDir>src/asciidoc/resources</asciidoctor-maven-plugin.baseDir>
                 <asciidoctor-maven-plugin.snippetsDirectory>${project.build.directory}/generated-snippets
                 </asciidoctor-maven-plugin.snippetsDirectory>
                 <asciidoctor-maven-plugin.outputDirectory>${project.build.directory}/classes/static/api-docs
                 </asciidoctor-maven-plugin.outputDirectory>
             </properties>
-
             <build>
                 <plugins>
                     <!-- AsciiDoc -->
@@ -568,18 +617,15 @@
             </build>
         </profile>
 
-
         <!-- =================  JIB ================= -->
         <profile>
             <id>jib</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-
             <properties>
                 <jib.from.image>gcr.io/distroless/java:11</jib.from.image>
             </properties>
-
             <build>
                 <plugins>
                     <plugin>
