@@ -392,7 +392,6 @@
             </dependencies>
             <build>
                 <plugins>
-
                     <!-- surefire -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -403,7 +402,6 @@
                             </includes>
                         </configuration>
                     </plugin>
-
                     <plugin>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-plugin</artifactId>
@@ -531,7 +529,6 @@
                 </plugins>
             </build>
         </profile>
-
 
         <!-- =================  Documentation ================= -->
         <profile>
