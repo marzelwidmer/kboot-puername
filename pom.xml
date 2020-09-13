@@ -10,7 +10,6 @@
     </parent>
     <groupId>ch.keepcalm</groupId>
     <artifactId>kboot-puername</artifactId>
-
     <version>${revision}</version>
 
     <name>puername</name>
@@ -22,12 +21,10 @@
         <kotlin.version>1.4.0</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
 
-        <!-- Jib -->
-        <jib.maven-plugin-version>2.5.2</jib.maven-plugin-version>
-        <jib.from.image>gcr.io/distroless/java@sha256:7fc091e8686df11f7bf0b7f67fd7da9862b2b9a3e49978d1184f0ff62cb673cc
-        </jib.from.image>
+        <!-- Spring Cloud  -->
+        <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
 
-        <!--	TEST	-->
+        <!-- TEST -->
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
@@ -35,11 +32,23 @@
         <hamkrest.version>1.7.0.3</hamkrest.version>
         <kluent.version>1.61</kluent.version>
         <testcontainers.version>1.14.3</testcontainers.version>
-        <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
-        <skip.integration.tests>true</skip.integration.tests>
-        <skip.unit.tests>false</skip.unit.tests>
         <kotlin-faker.version>1.4.1</kotlin-faker.version>
+        <mockito-kotlin.version>2.2.0</mockito-kotlin.version>
     </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
     <dependencies>
         <dependency>
@@ -49,6 +58,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <!-- Configuration processor -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
@@ -75,7 +90,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
         </dependency>
-
 
         <!-- TEST -->
         <dependency>
@@ -138,7 +152,6 @@
             <artifactId>sonar-maven-plugin</artifactId>
             <version>${sonar-maven-plugin.version}</version>
         </dependency>
-
         <!-- https://repo.spring.io/libs-release -->
         <!-- https://markusamshove.github.io/Kluent/ -->
         <dependency>
@@ -149,9 +162,8 @@
         </dependency>
     </dependencies>
 
+
     <build>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -159,6 +171,7 @@
                 <executions>
                     <execution>
                         <goals>
+                            <goal>repackage</goal>
                             <goal>build-info</goal>
                         </goals>
                     </execution>
@@ -170,117 +183,73 @@
                 </configuration>
             </plugin>
 
+            <!-- Kotlin -->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <configuration>
-                    <args>
-                        <arg>-Xjsr305=strict</arg>
-                    </args>
-                    <compilerPlugins>
-                        <plugin>spring</plugin>
-                    </compilerPlugins>
-                </configuration>
-                <!-- Integration Test Kotlin Test Compile-->
                 <executions>
                     <execution>
                         <id>compile</id>
+                        <phase>compile</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/main/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>test-compile</id>
+                        <phase>test-compile</phase>
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                                <sourceDir>${project.basedir}/src/integration-test/kotlin</sourceDir>
+                                <source>src/test/kotlin</source>
                             </sourceDirs>
                         </configuration>
                     </execution>
                 </executions>
-
+                <configuration>
+                    <args>
+                        <arg>-Xjsr305=warn</arg>
+                        <arg>-Xjsr305=@javax.annotation.Nullable:ignore</arg>
+                    </args>
+                    <compilerPlugins>
+                        <plugin>spring</plugin>
+                        <plugin>jpa</plugin>
+                    </compilerPlugins>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
                         <artifactId>kotlin-maven-allopen</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
+                    <!-- Used for JPA -->
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
                 </dependencies>
             </plugin>
 
-
-            <!-- integration-test -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>${build-helper-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>add-integration-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/integration-test/kotlin</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <!-- Add a new resource directory to our build -->
-                    <execution>
-                        <id>add-integration-test-resources</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>add-test-resource</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <filtering>true</filtering>
-                                    <directory>src/integration-test/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
 
             <!-- surefire -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <skipTests>${skip.unit.tests}</skipTests>
+                    <includes>
+                        <include>**/*Test.**</include>
+                    </includes>
                     <excludes>
-                        <exclude>**/*IT.java</exclude>
-                        <argLine>-Xms1024 -Xmx2028m</argLine>
+                        <exclude>**/*IntegrationTest.**</exclude>
                     </excludes>
-                </configuration>
-            </plugin>
-
-            <!-- failsafe -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-failsafe-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>integration-tests</id>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>**/*IT.java</includes>
-                    <skipTests>${skip.integration.tests}</skipTests>
                 </configuration>
             </plugin>
 
@@ -307,22 +276,345 @@
         </plugins>
     </build>
 
+
+    <!-- =================  Profiles ================= -->
     <profiles>
+        <!-- =================  Integration Tests ================= -->
         <profile>
-            <id>jib</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <!-- Build -->
+            <id>integration-tests</id>
             <build>
                 <plugins>
-                    <!-- Jib -->
+                    <plugin>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-plugin</artifactId>
+                        <version>${kotlin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>compile</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>test-compile</id>
+                                <goals>
+                                    <goal>test-compile</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDirs>
+                                        <sourceDir>${project.basedir}/src/integration-test/kotlin</sourceDir>
+                                    </sourceDirs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- integration-test  -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>${build-helper-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>add-integration-test-sources</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/integration-test/kotlin</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <!-- Add a new resource directory to our build -->
+                            <execution>
+                                <id>add-integration-test-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>add-test-resource</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <filtering>true</filtering>
+                                            <directory>src/integration-test/resources</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- surefire -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*IntegrationTest.**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*StagingIntegrationTest.**</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- =================  Contracts ================= -->
+        <profile>
+            <id>tests-with-contracts</id>
+            <dependencies>
+                <!-- Contracts -->
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-contract-verifier</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <!-- Remember to add this for the DSL support in the IDE and on the consumer side -->
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <!--  Used For Spring Contracts with WEBTESTCLIENT testMode  -->
+                <dependency>
+                    <groupId>io.rest-assured</groupId>
+                    <artifactId>spring-web-test-client</artifactId>
+                    <version>${rest-assured.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.restdocs</groupId>
+                    <artifactId>spring-restdocs-webtestclient</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <!-- surefire -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*Test.**</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-plugin</artifactId>
+                        <version>${kotlin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>compile</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>test-compile</id>
+                                <goals>
+                                    <goal>test-compile</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDirs>
+                                        <sourceDir>${project.basedir}/src/contracts-test/kotlin</sourceDir>
+                                    </sourceDirs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.cloud</groupId>
+                        <artifactId>spring-cloud-contract-maven-plugin</artifactId>
+                        <version>2.2.4.RELEASE</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <testFramework>JUNIT5</testFramework>
+                            <testMode>WEBTESTCLIENT</testMode>
+                            <baseClassForTests>
+                                ch.keepcalm.demo.contract.PersonRestBase
+                            </baseClassForTests>
+                            <failOnInProgress>false</failOnInProgress>
+                            <contractsDirectory>src/contracts-test/resources/contracts</contractsDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>convert</goal>
+                                    <goal>generateStubs</goal>
+                                    <goal>generateTests</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <!-- Contract Spec Kotlin -->
+                            <dependency>
+                                <groupId>org.springframework.cloud</groupId>
+                                <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
+                                <version>2.2.4.RELEASE</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <!-- Maven Compile -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.1</version>
+                        <executions>
+                            <!-- Replacing default-compile as it is treated specially by maven -->
+                            <execution>
+                                <id>default-compile</id>
+                                <phase>none</phase>
+                            </execution>
+                            <!-- Replacing default-testCompile as it is treated specially by maven -->
+                            <execution>
+                                <id>default-testCompile</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>java-compile</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>java-test-compile</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Add generated contracts test sources -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.build.directory}/generated-test-sources/contracts/</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <!-- Add a new resource directory to our build -->
+                            <execution>
+                                <id>add-contracts-test-resources</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>add-test-resource</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <filtering>true</filtering>
+                                            <directory>src/contracts-test/resources</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- =================  Documentation ================= -->
+        <profile>
+            <id>asciidoc</id>
+            <properties>
+                <!-- Asciidoc Configuration -->
+                <asciidoctor-maven-plugin.sourceDirectory>src/asciidoc/docs/</asciidoctor-maven-plugin.sourceDirectory>
+                <asciidoctor-maven-plugin.baseDir>src/asciidoc/resources</asciidoctor-maven-plugin.baseDir>
+                <asciidoctor-maven-plugin.snippetsDirectory>${project.build.directory}/generated-snippets
+                </asciidoctor-maven-plugin.snippetsDirectory>
+                <asciidoctor-maven-plugin.outputDirectory>${project.build.directory}/classes/static/api-docs
+                </asciidoctor-maven-plugin.outputDirectory>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- AsciiDoc -->
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
+                        <version>1.5.7.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-diagram</artifactId>
+                                <version>1.5.12</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.springframework.restdocs</groupId>
+                                <artifactId>spring-restdocs-asciidoctor</artifactId>
+                                <version>2.0.4.RELEASE</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <backend>html5</backend>
+                            <doctype>book</doctype>
+                            <sourceHighlighter>coderay</sourceHighlighter>
+                            <sourceDirectory>${asciidoctor-maven-plugin.sourceDirectory}</sourceDirectory>
+                            <outputDirectory>${asciidoctor-maven-plugin.outputDirectory}</outputDirectory>
+                            <baseDir>${asciidoctor-maven-plugin.baseDir}</baseDir>
+                            <requires>
+                                <require>asciidoctor-diagram</require>
+                            </requires>
+                            <attributes>
+                                <imagesdir>./images</imagesdir>
+                                <toc>left</toc>
+                                <icons>font</icons>
+                                <sectanchors>true</sectanchors>
+                                <idprefix/>
+                                <idseparator>-</idseparator>
+                                <docinfo1>true</docinfo1>
+                                <project-version>${project.version}</project-version>
+                                <project-name>${project.name}</project-name>
+                                <sourcedir>${project.build.sourceDirectory}</sourcedir>
+                                <sourcedirKotlin>${project.basedir}/src/main/kotlin</sourcedirKotlin>
+                                <project-version>${project.version}</project-version>
+                                <project-name>${project.name}</project-name>
+                                <project-artifact-name>${project.name}-${project.version}</project-artifact-name>
+                                <snippets>${asciidoctor-maven-plugin.snippetsDirectory}</snippets>
+                            </attributes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>generate-docs</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- =================  JIB ================= -->
+        <profile>
+            <id>jib</id>
+            <properties>
+                <jib.from.image>gcr.io/distroless/java:11</jib.from.image>
+            </properties>
+            <build>
+                <plugins>
                     <plugin>
                         <groupId>com.google.cloud.tools</groupId>
                         <artifactId>jib-maven-plugin</artifactId>
-                        <version>${jib.maven-plugin-version}</version>
+                        <version>2.5.2</version>
                         <configuration>
                             <from>
                                 <image>${jib.from.image}</image>
@@ -344,24 +636,7 @@
                 </plugins>
             </build>
         </profile>
-
-        <!-- Integration Tests  -->
-        <profile>
-            <id>integration-test</id>
-            <properties>
-                <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>true</skip.unit.tests>
-            </properties>
-        </profile>
-        <profile>
-            <id>all-tests</id>
-            <properties>
-                <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>false</skip.unit.tests>
-            </properties>
-        </profile>
     </profiles>
-
 
     <!-- Add jcenter as a repository for dependencies -->
     <repositories>
@@ -370,7 +645,6 @@
             <id>jcenter</id>
             <url>https://jcenter.bintray.com/</url>
         </repository>
-
     </repositories>
 
     <pluginRepositories>

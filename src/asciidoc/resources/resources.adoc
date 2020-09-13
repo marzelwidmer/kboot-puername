@@ -1,0 +1,8 @@
+== Api Root
+[[index]]
+The index resource provides the entry point into the service.
+
+A `GET` request is used to access the index entry point.
+
+#operation::APIControllerTest_validate_api_controller/[snippets='httpie-request,curl-request,response-body,links']
+

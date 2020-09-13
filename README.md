@@ -1,9 +1,10 @@
-# Run All Tests
+# Run Integration Tests
 ```
-./mvnw clean verify -P all-tests
+./mvnw clean install -P integration-tests-only
 ```
 
-# Run Integration Tests Only
+# Run Contracts Tests and  Unit Test
 ```
-./mvnw clean verify -P integration-test
+./mvnw clean install -P tests-with-contracts
 ```
+
