@@ -69,21 +69,7 @@ steps:
       codeCoverageToolOption: JaCoCo
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       goals: 'install'
-      options: '-Drevision=$(VERSION) -P tests-with-contracts,asciidoc'
-
-  # Maven verify -P all-tests
-  - task: Maven@3
-    displayName: 'asciidoc'
-    inputs:
-      mavenPomFile: 'pom.xml'
-      mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
-      mavenVersionOption: 'Default'
-      javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '$(JDK_VERSION)'
-      jdkArchitectureOption: 'x64'
-      sqMavenPluginVersionChoice: 'latest'
-      goals: 'install'
-      options: '-Drevision=$(VERSION) -P asciidoc'
+      options: '-Drevision=$(VERSION) -P tests-with-contracts,asciidoc,integration-tests'
 
   # Maven sonar:sonar
   - task: Maven@3
