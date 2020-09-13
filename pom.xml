@@ -218,6 +218,7 @@
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
                                 <sourceDir>${project.basedir}/src/integration-test/kotlin</sourceDir>
+                                <sourceDir>${project.basedir}/src/contracts-test/kotlin</sourceDir>
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -327,43 +328,24 @@
 
     <!-- Profiles -->
     <profiles>
-        <!-- =================  JIB ================= -->
+        <!-- Integration Tests  -->
         <profile>
-            <id>jib</id>
+            <id>integration-tests</id>
+            <properties>
+                <skip.integration.tests>false</skip.integration.tests>
+                <skip.unit.tests>true</skip.unit.tests>
+            </properties>
+        </profile>
+        <!-- All Tests  -->
+        <profile>
+            <id>all-tests</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-
             <properties>
-                <jib.from.image>gcr.io/distroless/java:11</jib.from.image>
+                <skip.integration.tests>false</skip.integration.tests>
+                <skip.unit.tests>false</skip.unit.tests>
             </properties>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.google.cloud.tools</groupId>
-                        <artifactId>jib-maven-plugin</artifactId>
-                        <version>2.5.2</version>
-                        <configuration>
-                            <from>
-                                <image>${jib.from.image}</image>
-                            </from>
-                            <allowInsecureRegistries>true</allowInsecureRegistries>
-                            <container>
-                                <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
-                            </container>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>dockerBuild</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
         <!-- =================  Contracts ================= -->
@@ -372,6 +354,7 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+
 
             <dependencies>
                 <!-- Contracts -->
@@ -414,7 +397,7 @@
                                 ch.keepcalm.demo.contract.PersonRestBase
                             </baseClassForTests>
                             <failOnInProgress>false</failOnInProgress>
-                            <contractsDirectory>src/integration-test/resources</contractsDirectory>
+                            <contractsDirectory>src/contracts-test/resources/contracts</contractsDirectory>
                         </configuration>
                         <executions>
                             <execution>
@@ -466,6 +449,7 @@
                             </execution>
                         </executions>
                     </plugin>
+
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>build-helper-maven-plugin</artifactId>
@@ -485,7 +469,7 @@
                             </execution>
                             <!-- Add a new resource directory to our build -->
                             <execution>
-                                <id>add-integration-test-resources</id>
+                                <id>add-contracts-test-resources</id>
                                 <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>add-test-resource</goal>
@@ -494,7 +478,7 @@
                                     <resources>
                                         <resource>
                                             <filtering>true</filtering>
-                                            <directory>src/integration-test/resources</directory>
+                                            <directory>src/contracts-test/resources</directory>
                                         </resource>
                                     </resources>
                                 </configuration>
@@ -585,24 +569,43 @@
         </profile>
 
 
-        <!-- Integration Tests  -->
+        <!-- =================  JIB ================= -->
         <profile>
-            <id>integration-tests</id>
-            <properties>
-                <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>true</skip.unit.tests>
-            </properties>
-        </profile>
-        <!-- All Tests  -->
-        <profile>
-            <id>all-tests</id>
+            <id>jib</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+
             <properties>
-                <skip.integration.tests>false</skip.integration.tests>
-                <skip.unit.tests>false</skip.unit.tests>
+                <jib.from.image>gcr.io/distroless/java:11</jib.from.image>
             </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <version>2.5.2</version>
+                        <configuration>
+                            <from>
+                                <image>${jib.from.image}</image>
+                            </from>
+                            <allowInsecureRegistries>true</allowInsecureRegistries>
+                            <container>
+                                <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                            </container>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

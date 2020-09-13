@@ -20,13 +20,6 @@ import org.springframework.web.reactive.function.server.body
 import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Flux
 
-
-//@WebFluxTest
-//@Import(value = [PersonRouter::class])
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@AutoConfigureWebTestClient
-//@AutoConfigureJsonTesters
-//@DirtiesContext
 @AutoConfigureRestDocs(outputDir = "target/snippets")
 @ExtendWith(RestDocumentationExtension::class, SpringExtension::class)
 abstract class PersonRestBase {
@@ -49,45 +42,3 @@ abstract class PersonRestBase {
         }
     }
 }
-//@ExtendWith(RestDocumentationExtension::class, SpringExtension::class)
-//@AutoConfigureRestDocs
-//abstract class PersonRestBase {
-//
-//    @BeforeEach
-//    fun setup(restDocumentation: RestDocumentationContextProvider?, testInfo: TestInfo) {
-//        RestAssuredWebTestClient
-//            .webTestClient(webTestClient2(restDocumentation))
-//    }
-//
-//
-//    private fun webTestClient(restDocumentation: RestDocumentationContextProvider?) = WebTestClient
-//        .bindToRouterFunction(apiPersons())
-//        .configureClient()
-//        .filter(documentationConfiguration(restDocumentation))
-//        .build()
-//
-//    private fun webTestClient2(restDocumentation: RestDocumentationContextProvider?) = WebTestClient
-//        .bindToRouterFunction(apiPersons())
-//        .configureClient().baseUrl("https://api.example.com")
-//        .filter(documentationConfiguration(restDocumentation))
-//        .build()
-//
-//    private fun webTestClient3(restDocumentation: RestDocumentationContextProvider?) = WebTestClient
-//        .bindToRouterFunction(apiPersons())
-//        .configureClient()
-//        .baseUrl("https://api.example.com")
-//        .filter(documentationConfiguration(restDocumentation)
-//            .operationPreprocessors()
-//            .withRequestDefaults(Preprocessors.prettyPrint())
-//            .withResponseDefaults(Preprocessors.prettyPrint()))
-//        .build()
-//
-//    private fun apiPersons(): RouterFunction<ServerResponse> = router {
-//        "api".nest {
-//            GET("/persons") {
-//                ok().contentType(MediaType.APPLICATION_JSON)
-//                    .body<Any>(Flux.just(PersonDocument(firstName = "John")))
-//            }
-//        }
-//    }
-//}
