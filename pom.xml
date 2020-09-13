@@ -16,7 +16,6 @@
     <description>Kotlin Spring Boot</description>
 
     <properties>
-        <spring-boot-maven-plugin.version>2.3.3.RELEASE</spring-boot-maven-plugin.version>
         <java.version>11</java.version>
         <revision>0.0.0</revision>
         <kotlin.version>1.4.0</kotlin.version>
@@ -25,16 +24,7 @@
         <!-- Spring Cloud  -->
         <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
 
-        <!-- Jib -->
-        <jib.maven-plugin-version>2.5.2</jib.maven-plugin-version>
-        <jib.from.image>gcr.io/distroless/java:11</jib.from.image>
-
-        <!--	TEST	-->
-        <!-- Spring Cloud Contracts -->
-        <spring-cloud-contract.version>2.2.4.RELEASE</spring-cloud-contract.version>
-        <rest-assured.version>4.0.0</rest-assured.version>
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-
+        <!-- TEST -->
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.6.0.1398</sonar-maven-plugin.version>
@@ -46,22 +36,7 @@
         <skip.integration.tests>true</skip.integration.tests>
         <skip.unit.tests>false</skip.unit.tests>
         <kotlin-faker.version>1.4.1</kotlin-faker.version>
-
         <mockito-kotlin.version>2.2.0</mockito-kotlin.version>
-
-        <!-- =================  Documentation ================= -->
-        <!-- Asciidoc -->
-        <spring-restdocs-asciidoctor.version>2.0.4.RELEASE</spring-restdocs-asciidoctor.version>
-        <asciidoctor.maven.plugin.version>1.5.7.1</asciidoctor.maven.plugin.version>
-        <asciidoctorj-diagram.version>1.5.12</asciidoctorj-diagram.version>
-        <asciidoctorj.version>1.5.8.1</asciidoctorj.version>
-        <!-- Asciidoc Configuration -->
-        <asciidoctor-maven-plugin.sourceDirectory>src/docs/asciidoc</asciidoctor-maven-plugin.sourceDirectory>
-        <asciidoctor-maven-plugin.baseDir>src/docs/resources</asciidoctor-maven-plugin.baseDir>
-        <asciidoctor-maven-plugin.snippetsDirectory>${project.build.directory}/generated-snippets
-        </asciidoctor-maven-plugin.snippetsDirectory>
-        <asciidoctor-maven-plugin.outputDirectory>${project.build.directory}/classes/static/api-docs
-        </asciidoctor-maven-plugin.outputDirectory>
     </properties>
 
 
@@ -189,32 +164,6 @@
             <version>${kluent.version}</version>
             <scope>test</scope>
         </dependency>
-
-
-        <!-- Contracts -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-contract-verifier</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!-- Remember to add this for the DSL support in the IDE and on the consumer side -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!--  Used For Spring Contracts with WEBTESTCLIENT testMode  -->
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>spring-web-test-client</artifactId>
-            <version>${rest-assured.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.restdocs</groupId>
-            <artifactId>spring-restdocs-webtestclient</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
 
@@ -225,7 +174,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -274,7 +222,6 @@
                         </configuration>
                     </execution>
                 </executions>
-
                 <dependencies>
                     <dependency>
                         <groupId>org.jetbrains.kotlin</groupId>
@@ -283,150 +230,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-
-
-            <!-- Contracts -->
-            <plugin>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-contract-maven-plugin</artifactId>
-                <version>${spring-cloud-contract.version}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <testFramework>JUNIT5</testFramework>
-                    <testMode>WEBTESTCLIENT</testMode>
-                    <!--                    <testMode>EXPLICIT</testMode>-->
-                    <baseClassForTests>
-                        ch.keepcalm.demo.contract.PersonRestBase
-                    </baseClassForTests>
-                    <failOnInProgress>false</failOnInProgress>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>convert</goal>
-                            <goal>generateStubs</goal>
-                            <goal>generateTests</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <!-- Contract Spec Kotlin -->
-                    <dependency>
-                        <groupId>org.springframework.cloud</groupId>
-                        <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
-                        <version>${spring-cloud-contract.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <!-- Maven Compile -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <executions>
-                    <!-- Replacing default-compile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <!-- Replacing default-testCompile as it is treated specially by maven -->
-                    <execution>
-                        <id>default-testCompile</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>java-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-test-sources/contracts/</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-            <!-- AsciiDoc -->
-            <plugin>
-                <groupId>org.asciidoctor</groupId>
-                <artifactId>asciidoctor-maven-plugin</artifactId>
-                <version>${asciidoctor.maven.plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.asciidoctor</groupId>
-                        <artifactId>asciidoctorj-diagram</artifactId>
-                        <version>${asciidoctorj-diagram.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.springframework.restdocs</groupId>
-                        <artifactId>spring-restdocs-asciidoctor</artifactId>
-                        <version>${spring-restdocs-asciidoctor.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <backend>html5</backend>
-                    <doctype>book</doctype>
-                    <sourceHighlighter>coderay</sourceHighlighter>
-                    <sourceDirectory>${asciidoctor-maven-plugin.sourceDirectory}</sourceDirectory>
-                    <outputDirectory>${asciidoctor-maven-plugin.outputDirectory}</outputDirectory>
-                    <baseDir>${asciidoctor-maven-plugin.baseDir}</baseDir>
-                    <requires>
-                        <require>asciidoctor-diagram</require>
-                    </requires>
-                    <attributes>
-                        <imagesdir>./images</imagesdir>
-                        <toc>left</toc>
-                        <icons>font</icons>
-                        <sectanchors>true</sectanchors>
-                        <idprefix/>
-                        <idseparator>-</idseparator>
-                        <docinfo1>true</docinfo1>
-                        <project-version>${project.version}</project-version>
-                        <project-name>${project.name}</project-name>
-                        <sourcedir>${project.build.sourceDirectory}</sourcedir>
-                        <sourcedirKotlin>${project.basedir}/src/main/kotlin</sourcedirKotlin>
-                        <project-version>${project.version}</project-version>
-                        <project-name>${project.name}</project-name>
-                        <project-artifact-name>${project.name}-${project.version}</project-artifact-name>
-                        <snippets>${asciidoctor-maven-plugin.snippetsDirectory}</snippets>
-                    </attributes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>generate-docs</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>process-asciidoc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
 
             <!-- integration-test -->
             <plugin>
@@ -524,17 +327,23 @@
 
     <!-- Profiles -->
     <profiles>
-        <!-- JIB -->
+        <!-- =================  JIB ================= -->
         <profile>
             <id>jib</id>
-            <!-- Build -->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <properties>
+                <jib.from.image>gcr.io/distroless/java:11</jib.from.image>
+            </properties>
+
             <build>
                 <plugins>
-                    <!-- Jib -->
                     <plugin>
                         <groupId>com.google.cloud.tools</groupId>
                         <artifactId>jib-maven-plugin</artifactId>
-                        <version>${jib.maven-plugin-version}</version>
+                        <version>2.5.2</version>
                         <configuration>
                             <from>
                                 <image>${jib.from.image}</image>
@@ -556,6 +365,208 @@
                 </plugins>
             </build>
         </profile>
+
+        <!-- =================  Contracts ================= -->
+        <profile>
+            <id>contracts</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <dependencies>
+                <!-- Contracts -->
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-contract-verifier</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <!-- Remember to add this for the DSL support in the IDE and on the consumer side -->
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
+                    <scope>test</scope>
+                </dependency>
+                <!--  Used For Spring Contracts with WEBTESTCLIENT testMode  -->
+                <dependency>
+                    <groupId>io.rest-assured</groupId>
+                    <artifactId>spring-web-test-client</artifactId>
+                    <version>${rest-assured.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.restdocs</groupId>
+                    <artifactId>spring-restdocs-webtestclient</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.cloud</groupId>
+                        <artifactId>spring-cloud-contract-maven-plugin</artifactId>
+                        <version>2.2.4.RELEASE</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <testFramework>JUNIT5</testFramework>
+                            <testMode>WEBTESTCLIENT</testMode>
+                            <baseClassForTests>
+                                ch.keepcalm.demo.contract.PersonRestBase
+                            </baseClassForTests>
+                            <failOnInProgress>false</failOnInProgress>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>convert</goal>
+                                    <goal>generateStubs</goal>
+                                    <goal>generateTests</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <!-- Contract Spec Kotlin -->
+                            <dependency>
+                                <groupId>org.springframework.cloud</groupId>
+                                <artifactId>spring-cloud-contract-spec-kotlin</artifactId>
+                                <version>2.2.4.RELEASE</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <!-- Maven Compile -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.1</version>
+                        <executions>
+                            <!-- Replacing default-compile as it is treated specially by maven -->
+                            <execution>
+                                <id>default-compile</id>
+                                <phase>none</phase>
+                            </execution>
+                            <!-- Replacing default-testCompile as it is treated specially by maven -->
+                            <execution>
+                                <id>default-testCompile</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>java-compile</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>java-test-compile</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${project.build.directory}/generated-test-sources/contracts/</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+
+        <!-- =================  Documentation ================= -->
+        <profile>
+            <id>asciidoc</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <properties>
+                <!-- Asciidoc Configuration -->
+                <asciidoctor-maven-plugin.sourceDirectory>src/docs/asciidoc</asciidoctor-maven-plugin.sourceDirectory>
+                <asciidoctor-maven-plugin.baseDir>src/docs/resources</asciidoctor-maven-plugin.baseDir>
+                <asciidoctor-maven-plugin.snippetsDirectory>${project.build.directory}/generated-snippets
+                </asciidoctor-maven-plugin.snippetsDirectory>
+                <asciidoctor-maven-plugin.outputDirectory>${project.build.directory}/classes/static/api-docs
+                </asciidoctor-maven-plugin.outputDirectory>
+            </properties>
+
+            <build>
+                <plugins>
+                    <!-- AsciiDoc -->
+                    <plugin>
+                        <groupId>org.asciidoctor</groupId>
+                        <artifactId>asciidoctor-maven-plugin</artifactId>
+                        <version>1.5.7.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.asciidoctor</groupId>
+                                <artifactId>asciidoctorj-diagram</artifactId>
+                                <version>1.5.12</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.springframework.restdocs</groupId>
+                                <artifactId>spring-restdocs-asciidoctor</artifactId>
+                                <version>2.0.4.RELEASE</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <backend>html5</backend>
+                            <doctype>book</doctype>
+                            <sourceHighlighter>coderay</sourceHighlighter>
+                            <sourceDirectory>${asciidoctor-maven-plugin.sourceDirectory}</sourceDirectory>
+                            <outputDirectory>${asciidoctor-maven-plugin.outputDirectory}</outputDirectory>
+                            <baseDir>${asciidoctor-maven-plugin.baseDir}</baseDir>
+                            <requires>
+                                <require>asciidoctor-diagram</require>
+                            </requires>
+                            <attributes>
+                                <imagesdir>./images</imagesdir>
+                                <toc>left</toc>
+                                <icons>font</icons>
+                                <sectanchors>true</sectanchors>
+                                <idprefix/>
+                                <idseparator>-</idseparator>
+                                <docinfo1>true</docinfo1>
+                                <project-version>${project.version}</project-version>
+                                <project-name>${project.name}</project-name>
+                                <sourcedir>${project.build.sourceDirectory}</sourcedir>
+                                <sourcedirKotlin>${project.basedir}/src/main/kotlin</sourcedirKotlin>
+                                <project-version>${project.version}</project-version>
+                                <project-name>${project.name}</project-name>
+                                <project-artifact-name>${project.name}-${project.version}</project-artifact-name>
+                                <snippets>${asciidoctor-maven-plugin.snippetsDirectory}</snippets>
+                            </attributes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>generate-docs</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>process-asciidoc</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
 
         <!-- Integration Tests  -->
         <profile>
