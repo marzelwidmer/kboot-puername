@@ -53,7 +53,7 @@ steps:
 
   # Maven verify -P all-tests
   - task: Maven@3
-    displayName: 'All tests'
+    displayName: 'Test'
     inputs:
       mavenPomFile: 'pom.xml'
       mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
@@ -69,7 +69,7 @@ steps:
       codeCoverageToolOption: JaCoCo
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       goals: 'verify'
-      options: '-Drevision=$(VERSION) -P all-tests'
+      options: '-Drevision=$(VERSION)'
 
   # Maven sonar:sonar
   - task: Maven@3
