@@ -10,7 +10,6 @@
     </parent>
     <groupId>ch.keepcalm</groupId>
     <artifactId>kboot-puername</artifactId>
-
     <version>${revision}</version>
 
     <name>puername</name>
