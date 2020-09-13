@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  GIT_VERSION_CONFIGURATION: '../ci/GitVersion.yaml'
+  GIT_VERSION_CONFIGURATION: './ci/GitVersion.yaml'
   JDK_VERSION: '1.11'
   MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
   MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
